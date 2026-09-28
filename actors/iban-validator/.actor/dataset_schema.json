@@ -1,0 +1,37 @@
+{
+  "actorSpecification": 1,
+  "fields": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "input": { "type": "string", "description": "The IBAN cell exactly as provided (for joining results back to your data)." },
+      "source": { "type": "string", "description": "Where the entry came from: \"ibans\" (list) or \"csvText\"." },
+      "position": { "type": "integer", "description": "1-based position among the non-blank entries of that source." },
+      "valid": { "type": "boolean", "description": "true if length, national format and check digits of the IBAN are correct. The BIC does not influence this field." },
+      "reasonCode": { "type": "string", "description": "OK, EMPTY, INVALID_CHARACTERS, BAD_PREFIX, UNKNOWN_COUNTRY, WRONG_LENGTH, BAD_BBAN_FORMAT, BAD_CHECKSUM or INTERNAL_ERROR." },
+      "reason": { "type": "string", "description": "Human-readable explanation of the verdict." },
+      "iban": { "type": ["string", "null"], "description": "Normalized IBAN in electronic format (upper case, no separators); null if the input was empty." },
+      "ibanFormatted": { "type": ["string", "null"], "description": "Print format in groups of four; only for valid IBANs." },
+      "countryCode": { "type": ["string", "null"], "description": "ISO country code of the IBAN (once the prefix is well-formed)." },
+      "countryName": { "type": ["string", "null"], "description": "Country name (null for unknown countries)." },
+      "checkDigits": { "type": ["string", "null"], "description": "The two check digits (valid IBANs only)." },
+      "bban": { "type": ["string", "null"], "description": "Basic Bank Account Number: everything after country code and check digits (valid IBANs only)." },
+      "bankCode": { "type": ["string", "null"], "description": "National bank code where the country format defines it (valid IBANs only)." },
+      "branchCode": { "type": ["string", "null"], "description": "Branch / sort code where the country format defines it (valid IBANs only)." },
+      "accountNumber": { "type": ["string", "null"], "description": "National account number where the country format defines it (valid IBANs only)." },
+      "bic": { "type": ["string", "null"], "description": "The BIC/SWIFT code as normalized (upper case), null if none was provided." },
+      "bicValid": { "type": ["boolean", "null"], "description": "Whether the BIC has a valid ISO 9362 format; null if none was provided. Format check only, not a directory lookup." },
+      "bicReason": { "type": ["string", "null"], "description": "Why the BIC format is invalid (null otherwise)." }
+    },
+    "required": ["input", "source", "position", "valid", "reasonCode", "reason"]
+  },
+  "views": {
+    "overview": {
+      "title": "Overview",
+      "transformation": {
+        "fields": ["input", "valid", "reasonCode", "ibanFormatted", "countryCode", "bankCode", "branchCode", "accountNumber", "bic", "bicValid"]
+      },
+      "display": { "component": "table" }
+    }
+  }
+}

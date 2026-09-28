@@ -1,0 +1,36 @@
+{
+  "title": "IBAN Validator & Normalizer input",
+  "type": "object",
+  "schemaVersion": 1,
+  "description": "Paste IBANs (one per line) and/or CSV text. Every non-blank IBAN produces one result row and one billed event. Spaces, hyphens and lower case are fine.",
+  "properties": {
+    "ibans": {
+      "title": "IBANs",
+      "type": "array",
+      "description": "One IBAN per line, e.g. \"GB82 WEST 1234 5698 7654 32\". To check a BIC as well, write \"IBAN,BIC\" on the same line, e.g. \"NL91ABNA0417164300,ABNANL2A\".",
+      "editor": "stringList",
+      "prefill": [
+        "GB82 WEST 1234 5698 7654 32",
+        "DE89370400440532013000",
+        "FR1420041010050500013M02606",
+        "NL91ABNA0417164300,ABNANL2A",
+        "DE89370400440532013001",
+        "NOTANIBAN"
+      ]
+    },
+    "csvText": {
+      "title": "CSV text (optional)",
+      "type": "string",
+      "description": "Alternative or additional input: paste CSV text. With a header row containing \"iban\" (and optionally \"bic\" or \"swift\") those columns are used and all others are ignored. Without a header, column 1 is the IBAN and column 2 (if present) the BIC. Comma, semicolon, tab or pipe delimited.",
+      "editor": "textarea"
+    },
+    "maxItems": {
+      "title": "Maximum IBANs per run",
+      "type": "integer",
+      "description": "Safety cap: only the first N IBANs (list first, then CSV) are validated and billed.",
+      "default": 10000,
+      "minimum": 1,
+      "maximum": 100000
+    }
+  }
+}

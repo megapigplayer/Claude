@@ -1,0 +1,78 @@
+name: deploy
+
+# Manual deploy of ONE Actor to the Apify platform with `apify push`.
+# Inert without the APIFY_TOKEN repository secret: the job succeeds, prints a notice and does nothing.
+# NOT VERIFIED end-to-end: the authoring environment had no Apify account and no network access to
+# apify.com, so `apify push` itself has never been run from this workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      actor:
+        description: "Folder name under actors/ to deploy (e.g. iban-validator)"
+        required: true
+        type: string
+      wait_for_build_secs:
+        description: "Seconds to wait for the Apify build to finish (0 = fire and forget)"
+        required: false
+        default: "600"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ inputs.actor }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+      APIFY_CLI_DISABLE_TELEMETRY: "1"
+      # User-controlled inputs go through env vars, never straight into `run:` scripts.
+      ACTOR: ${{ inputs.actor }}
+      WAIT_SECS: ${{ inputs.wait_for_build_secs }}
+    steps:
+      - name: Gate on the APIFY_TOKEN secret
+        id: gate
+        run: |
+          if [ -z "$APIFY_TOKEN" ]; then
+            echo "::notice title=Deploy skipped::The APIFY_TOKEN repository secret is not set, so nothing was pushed. Add it under Settings > Secrets and variables > Actions to enable deploys."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.enabled == 'true'
+
+      - name: Validate inputs
+        if: steps.gate.outputs.enabled == 'true'
+        run: |
+          if ! printf '%s' "$ACTOR" | grep -Eq '^[a-z0-9]+(-[a-z0-9]+)*$'; then
+            echo "::error::Invalid actor name '$ACTOR' (expected the kebab-case folder name under actors/)"; exit 1
+          fi
+          if [ ! -f "actors/$ACTOR/.actor/actor.json" ]; then
+            echo "::error::actors/$ACTOR/.actor/actor.json not found"; exit 1
+          fi
+          if ! printf '%s' "$WAIT_SECS" | grep -Eq '^[0-9]+$'; then
+            echo "::error::wait_for_build_secs must be a non-negative integer"; exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.enabled == 'true'
+        with:
+          node-version: 22
+
+      # Never push an Actor that does not pass the same gate as CI.
+      - name: Test the Actor before pushing (build, unit tests, local smoke run)
+        if: steps.gate.outputs.enabled == 'true'
+        run: node scripts/test-all.mjs --only "$ACTOR" --smoke
+
+      # apify-cli comes from the root devDependencies installed by test-all above.
+      - name: Push to Apify
+        if: steps.gate.outputs.enabled == 'true'
+        working-directory: actors/${{ inputs.actor }}
+        run: ../../node_modules/.bin/apify push --wait-for-finish "$WAIT_SECS"

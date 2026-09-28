@@ -1,0 +1,16 @@
+{
+  "actorSpecification": 1,
+  "name": "iban-validator",
+  "title": "IBAN Validator & Normalizer",
+  "description": "Validate and normalize IBANs in bulk: ISO 13616 mod-97 checksum, country length, print format, bank/branch extraction and BIC format check. Offline algorithm, no bank API, no login.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "minMemoryMbytes": 256,
+  "defaultMemoryMbytes": 256,
+  "input": "./input_schema.json",
+  "dockerfile": "../Dockerfile",
+  "readme": "../README.md",
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  }
+}

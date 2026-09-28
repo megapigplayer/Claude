@@ -1,0 +1,77 @@
+{
+  "requiredFields": [
+    "input",
+    "source",
+    "position",
+    "valid",
+    "reasonCode",
+    "reason",
+    "iban",
+    "ibanFormatted",
+    "countryCode",
+    "bic",
+    "bicValid"
+  ],
+  "expectedItems": 6,
+  "rows": [
+    {
+      "input": "GB82 WEST 1234 5698 7654 32",
+      "valid": true,
+      "reasonCode": "OK",
+      "iban": "GB82WEST12345698765432",
+      "ibanFormatted": "GB82 WEST 1234 5698 7654 32",
+      "countryCode": "GB",
+      "bankCode": "WEST",
+      "branchCode": "123456",
+      "accountNumber": "98765432",
+      "bic": null,
+      "bicValid": null
+    },
+    {
+      "input": "DE89370400440532013000",
+      "valid": true,
+      "countryCode": "DE",
+      "bankCode": "37040044",
+      "accountNumber": "0532013000"
+    },
+    {
+      "input": "FR1420041010050500013M02606",
+      "valid": true,
+      "countryCode": "FR",
+      "bankCode": "20041",
+      "branchCode": "01005",
+      "accountNumber": "0500013M026"
+    },
+    {
+      "input": "NL91ABNA0417164300",
+      "valid": true,
+      "reasonCode": "OK",
+      "countryCode": "NL",
+      "bankCode": "ABNA",
+      "accountNumber": "0417164300",
+      "bic": "ABNANL2A",
+      "bicValid": true,
+      "bicReason": null
+    },
+    {
+      "input": "DE89370400440532013001",
+      "valid": false,
+      "reasonCode": "BAD_CHECKSUM",
+      "ibanFormatted": null
+    },
+    {
+      "input": "NOTANIBAN",
+      "valid": false,
+      "reasonCode": "BAD_PREFIX",
+      "countryCode": null
+    }
+  ],
+  "charge": {
+    "eventName": "iban-validated",
+    "perItem": 1
+  },
+  "budgetCap": {
+    "maxTotalChargeUsd": 2,
+    "expectedItems": 2
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "apify-tools",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Monorepo of small, paid Apify Actors (pay-per-event) maintained on a schedule.",
+  "type": "module",
+  "workspaces": [
+    "actors/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "new-actor": "node scripts/new-actor.mjs",
+    "test": "node scripts/test-all.mjs",
+    "test-all": "node scripts/test-all.mjs",
+    "test:scripts": "node --test scripts/test/*.test.mjs",
+    "smoke": "node scripts/smoke-local.mjs",
+    "health": "node scripts/check-health.mjs"
+  },
+  "devDependencies": {
+    "@apify/json_schemas": "^0.16.19",
+    "apify-cli": "^1.10.0"
+  },
+  "license": "UNLICENSED"
+}

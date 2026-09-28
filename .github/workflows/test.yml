@@ -1,0 +1,45 @@
+name: test
+
+# Runs the whole quality gate on every push and pull request: static conventions check,
+# official Apify schema validation, tsc build, vitest unit tests and an offline local smoke
+# run (incl. simulated pay-per-event charging) for every Actor and for the template.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      standalone:
+        description: "Also copy each Actor out of the repo and npm install/build/test it alone (Docker-like, slower)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test-all:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      APIFY_CLI_DISABLE_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Works with or without a committed package-lock.json.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package.json', 'package-lock.json', 'actors/*/package.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-
+
+      - name: Install, check, build, unit-test and smoke-run every Actor
+        run: node scripts/test-all.mjs --smoke ${{ inputs.standalone && '--standalone' || '' }}

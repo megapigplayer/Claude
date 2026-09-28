@@ -1,0 +1,12 @@
+{
+  "_note": "Repo-local pricing plan. Apify does NOT read this file: prices are entered in Apify Console > Publication > Monetization (actor.json has no pricing field - verified against the official actor.json schema in @apify/json_schemas). It exists so scripts can cross-check that every event the code charges is declared here, and that priceUsd >= 5 x estimatedCostUsd (CONVENTIONS.md, pricing rule).",
+  "events": {
+    "iban-validated": {
+      "title": "IBAN validated",
+      "description": "Charged once per IBAN that was checked, whether the verdict is valid or invalid (one dataset row). Blank entries are skipped and free.",
+      "priceUsd": 0.002,
+      "estimatedCostUsd": 2e-05,
+      "costBasis": "Measured locally on 2026-09-28 with `node scripts/smoke-local.mjs iban-validator --measure` and a 10,000-IBAN scratch run: 6 IBANs = 0.43 s wall / 96 MB peak RSS; 10,000 IBANs = 10.2 s wall / 135 MB peak RSS. At 256 MB billed memory and an ASSUMED $0.40 per compute unit (unverified; set SMOKE_CU_USD to your plan's price) a 1-IBAN run costs about $1.2e-5 (worst case per event, dominated by process start) and a 10k run about $2.8e-8 per IBAN. Rounded up to 2e-5. No paid external API, no proxy. Container start-up and storage-API overhead on the real platform cannot be measured offline."
+    }
+  }
+}

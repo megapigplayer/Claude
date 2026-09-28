@@ -1,0 +1,32 @@
+name: health
+
+# Nightly: read the recent run status of every Actor through the Apify API and fail loudly when one
+# is unhealthy (Apify marks a public Actor "under maintenance" when 2 of its last 3 daily test runs fail).
+# Without the APIFY_TOKEN secret the job exits 0 with a notice.
+# NOT VERIFIED against the live API: the authoring environment could not reach api.apify.com. The
+# evaluation logic is unit-tested in scripts/test/health.test.mjs with fixture responses.
+# Note: GitHub disables scheduled workflows after 60 days without repository activity.
+on:
+  schedule:
+    - cron: "23 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # scripts/check-health.mjs prints a notice and exits 0 when APIFY_TOKEN is empty.
+      - name: Check recent Actor runs
+        run: node scripts/check-health.mjs
