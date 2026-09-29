@@ -2,7 +2,7 @@
   "actorSpecification": 1,
   "name": "jewish-holidays-calendar",
   "title": "Jewish Holidays Calendar API (Hebcal-style)",
-  "description": "One-line description of what this Actor does, shown in search results.",
+  "description": "Full Jewish/Hebrew calendar for any year: chagim, fasts, Rosh Chodesh, Omer, parasha and Hebrew dates, Israel or diaspora schedule, as JSON, CSV or iCal.",
   "version": "0.0",
   "buildTag": "latest",
   "minMemoryMbytes": 256,

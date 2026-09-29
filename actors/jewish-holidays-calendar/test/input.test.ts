@@ -8,39 +8,84 @@ const schema = JSON.parse(readFileSync(schemaPath, 'utf8')) as {
   properties: Record<string, { prefill?: unknown; default?: unknown }>;
 };
 
-describe('normalizeInput', () => {
-  it('uses the demo input when there is no INPUT record, or the work-defining field is absent', () => {
+describe('normalizeInput: demo fallback', () => {
+  it('null, undefined and {} all fall back to DEFAULT_INPUT', () => {
     expect(normalizeInput(null)).toEqual(DEFAULT_INPUT);
     expect(normalizeInput(undefined)).toEqual(DEFAULT_INPUT);
-    expect(normalizeInput({})).toEqual(DEFAULT_INPUT); // platform health run may pass {}
-    expect(normalizeInput({ maxItems: 5 })).toEqual({ ...DEFAULT_INPUT, maxItems: 5 }); // schema defaults only
+    expect(normalizeInput({})).toEqual(DEFAULT_INPUT);
   });
 
-  it('returns a fresh copy of the defaults (no shared mutable state)', () => {
+  it('returns a fresh copy (no shared mutable state across calls)', () => {
     const a = normalizeInput(null);
-    a.items.push('mutated');
-    expect(normalizeInput(null).items).toEqual(DEFAULT_INPUT.items);
+    a.include.push('modern');
+    expect(normalizeInput(null).include).toEqual(DEFAULT_INPUT.include);
   });
 
-  it('accepts a normal input and applies the default maxItems', () => {
-    expect(normalizeInput({ items: ['a', 'b'] })).toEqual({ items: ['a', 'b'], maxItems: DEFAULT_INPUT.maxItems });
-  });
-
-  it('drops blank strings and non-strings', () => {
-    expect(normalizeInput({ items: ['a', '  ', 3, null, 'b'] }).items).toEqual(['a', 'b']);
-  });
-
-  it('rejects unusable input with a readable InputError instead of running the demo input', () => {
-    expect(() => normalizeInput({ items: [] })).toThrow(InputError);
-    expect(() => normalizeInput({ items: ['  '] })).toThrow(/at least one/);
-    expect(() => normalizeInput({ items: 'a' })).toThrow(/must be an array/);
-    expect(() => normalizeInput('nope')).toThrow(/JSON object/);
-    expect(() => normalizeInput({ items: ['a'], maxItems: 0 })).toThrow(/maxItems/);
+  it('a run with only one field set still fills in the rest of the demo', () => {
+    expect(normalizeInput({ location: 'diaspora' })).toEqual({ ...DEFAULT_INPUT, location: 'diaspora' });
   });
 });
 
-describe('DEFAULT_INPUT vs .actor/input_schema.json', () => {
-  it('matches the schema prefill/default values exactly (drift guard)', () => {
+describe('normalizeInput: year', () => {
+  it('accepts a number or a numeric string', () => {
+    expect(normalizeInput({ year: 2030 }).year).toBe(2030);
+    expect(normalizeInput({ year: '2030' }).year).toBe(2030);
+  });
+
+  it('rejects a non-integer, out-of-range, or non-numeric year', () => {
+    expect(() => normalizeInput({ year: 2026.5 })).toThrow(InputError);
+    expect(() => normalizeInput({ year: 0 })).toThrow(InputError);
+    expect(() => normalizeInput({ year: 10000 })).toThrow(InputError);
+    expect(() => normalizeInput({ year: 'abc' })).toThrow(InputError);
+  });
+});
+
+describe('normalizeInput: enum options', () => {
+  it('accepts valid values case-insensitively', () => {
+    expect(normalizeInput({ yearType: 'HEBREW' }).yearType).toBe('hebrew');
+    expect(normalizeInput({ location: 'Diaspora' }).location).toBe('diaspora');
+    expect(normalizeInput({ format: 'CSV' }).format).toBe('csv');
+  });
+
+  it('rejects an unknown value with a readable message', () => {
+    expect(() => normalizeInput({ yearType: 'julian' })).toThrow(/yearType/);
+    expect(() => normalizeInput({ location: 'mars' })).toThrow(InputError);
+    expect(() => normalizeInput({ language: 'fr' })).toThrow(InputError);
+    expect(() => normalizeInput({ format: 'pdf' })).toThrow(InputError);
+  });
+});
+
+describe('normalizeInput: include', () => {
+  it('accepts a list, case-insensitively, and de-duplicates', () => {
+    expect(normalizeInput({ include: ['Major', 'MAJOR', 'fasts'] }).include).toEqual(['major', 'fasts']);
+  });
+
+  it('accepts a comma-separated string', () => {
+    expect(normalizeInput({ include: 'major,fasts' }).include).toEqual(['major', 'fasts']);
+  });
+
+  it('an empty array is valid (produces only the meta row; not an input error)', () => {
+    expect(normalizeInput({ include: [] }).include).toEqual([]);
+  });
+
+  it('rejects an unknown category name', () => {
+    expect(() => normalizeInput({ include: ['major', 'chanukah'] })).toThrow(/unknown category/);
+  });
+
+  it('rejects a non-array, non-string value', () => {
+    expect(() => normalizeInput({ include: 42 })).toThrow(InputError);
+  });
+});
+
+describe('normalizeInput: top-level validation', () => {
+  it('rejects a non-object input', () => {
+    expect(() => normalizeInput('nope')).toThrow(InputError);
+    expect(() => normalizeInput([1, 2])).toThrow(InputError);
+  });
+});
+
+describe('DEFAULT_INPUT vs .actor/input_schema.json (drift guard)', () => {
+  it('matches the schema prefill/default values exactly', () => {
     for (const [key, prop] of Object.entries(schema.properties)) {
       const expected = prop.prefill !== undefined ? prop.prefill : prop.default;
       if (expected === undefined) continue;

@@ -1,4 +1,8 @@
 {
-  "items": ["example-1", "example-2"],
-  "maxItems": 1000
+  "year": 2026,
+  "yearType": "gregorian",
+  "location": "israel",
+  "include": ["major", "minor", "fasts", "roshChodesh", "modern", "omer", "parasha", "specialShabbat"],
+  "language": "both",
+  "format": "json"
 }

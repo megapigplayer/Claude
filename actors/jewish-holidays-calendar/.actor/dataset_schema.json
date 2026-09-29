@@ -4,29 +4,52 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-      "input": {
-        "type": "string",
-        "description": "The original input item this result was computed from."
-      },
-      "ok": {
-        "type": "boolean",
-        "description": "Whether this item was processed successfully."
-      },
-      "error": {
-        "type": ["string", "null"],
-        "description": "Error message when ok is false, otherwise null."
+      "rowType": { "type": "string", "enum": ["holiday", "meta"], "description": "\"holiday\" for one calendar day/event; \"meta\" for the single trailing summary row." },
+      "date": { "type": ["string", "null"], "description": "Gregorian date (ISO YYYY-MM-DD) of the event. Null on the meta row." },
+      "hebrewDate": { "type": ["string", "null"], "description": "English-formatted Hebrew date, e.g. \"1 Tishrei 5787\"." },
+      "hebrewDateHe": { "type": ["string", "null"], "description": "Hebrew date in gematria, e.g. \"א׳ בתשרי תשפ״ז\"." },
+      "name": { "type": ["string", "null"], "description": "English holiday/event name." },
+      "nameHe": { "type": ["string", "null"], "description": "Hebrew holiday/event name." },
+      "category": { "type": ["string", "null"], "description": "One of: major, minor, fast, cholHamoed, modern, roshChodesh, omer, parasha, specialShabbat." },
+      "beginsEveningBefore": { "type": ["boolean", "null"], "description": "True when the observance begins at sunset the evening before the listed date (every Yom Tov and every major fast)." },
+      "isYomTov": { "type": ["boolean", "null"], "description": "True for an actual Yom Tov day (work-restricted festival day, including Yom Kippur); false for Chol HaMoed, fasts, Rosh Chodesh, modern and minor days." },
+      "isIsraeliPublicHoliday": { "type": ["boolean", "null"], "description": "True for one of the nine statutory Israeli public-holiday days. Only set (non-null) when the run's location is \"israel\"." },
+      "memo": { "type": ["string", "null"], "description": "Extra note, e.g. when a fast was deferred off Shabbat, or (meta row) a summary of the request." },
+      "hebrewYear": { "type": ["integer", "null"], "description": "Hebrew year this row's date falls in." },
+      "isLeapYear": { "type": ["boolean", "null"], "description": "Whether hebrewYear has 13 months (Adar I + Adar II)." },
+      "hebrewYearsInRange": {
+        "type": ["array", "null"],
+        "description": "Meta row only: every distinct Hebrew year touched by the requested year, each with isLeapYear and yearLength (days).",
+        "items": {
+          "type": "object",
+          "properties": {
+            "hebrewYear": { "type": "integer" },
+            "isLeapYear": { "type": "boolean" },
+            "yearLength": { "type": "integer" }
+          }
+        }
       }
     },
-    "required": ["input", "ok"]
+    "required": ["rowType"]
   },
   "views": {
     "overview": {
       "title": "Overview",
       "transformation": {
-        "fields": ["input", "ok", "error"]
+        "fields": ["date", "hebrewDate", "hebrewDateHe", "name", "category", "isYomTov", "isIsraeliPublicHoliday", "memo"]
       },
       "display": {
-        "component": "table"
+        "component": "table",
+        "properties": {
+          "date": { "label": "Date" },
+          "hebrewDate": { "label": "Hebrew date" },
+          "hebrewDateHe": { "label": "עברית" },
+          "name": { "label": "Name" },
+          "category": { "label": "Category" },
+          "isYomTov": { "label": "Yom Tov" },
+          "isIsraeliPublicHoliday": { "label": "IL public holiday" },
+          "memo": { "label": "Memo" }
+        }
       }
     }
   }

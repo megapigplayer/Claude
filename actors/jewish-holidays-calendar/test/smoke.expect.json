@@ -1,31 +1,32 @@
 {
+  "_note": "This Actor charges ONE 'calendar-year' event per run regardless of dataset row count (verified manually: node scripts/smoke-local.mjs jewish-holidays-calendar --measure, and ACTOR_TEST_PAY_PER_EVENT smoke runs), so the generic charge/budgetCap per-row fields are intentionally omitted - they assume one charge per dataset row, which does not apply here. `rows` is checked BY INDEX (smoke.mjs), so it references index 0 (rows are sorted by date; the earliest 2026 event under the default include is Ta'anit Esther on 2026-03-02) and the last index, 31 (the trailing meta row).",
   "requiredFields": [
-    "input",
-    "ok",
-    "value",
-    "error"
+    "rowType",
+    "date",
+    "hebrewDate",
+    "hebrewDateHe",
+    "name",
+    "nameHe",
+    "category",
+    "beginsEveningBefore",
+    "isYomTov",
+    "isIsraeliPublicHoliday",
+    "memo",
+    "hebrewYear",
+    "isLeapYear",
+    "hebrewYearsInRange"
   ],
-  "expectedItems": 2,
+  "expectedItems": 32,
   "rows": [
     {
-      "input": "example-1",
-      "ok": true,
-      "value": "EXAMPLE-1",
-      "error": null
-    },
-    {
-      "input": "example-2",
-      "ok": true,
-      "value": "EXAMPLE-2",
-      "error": null
+      "rowType": "holiday",
+      "date": "2026-03-02",
+      "name": "Ta'anit Esther",
+      "category": "fast",
+      "isYomTov": false,
+      "isIsraeliPublicHoliday": false,
+      "hebrewYear": 5786,
+      "isLeapYear": false
     }
-  ],
-  "charge": {
-    "eventName": "task-completed",
-    "perItem": 1
-  },
-  "budgetCap": {
-    "maxTotalChargeUsd": 1,
-    "expectedItems": 1
-  }
+  ]
 }

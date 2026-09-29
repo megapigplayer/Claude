@@ -1,16 +1,16 @@
 /**
- * Thin Apify wrapper for Jewish Holidays Calendar API (Hebcal-style).
+ * Thin Apify wrapper for the Jewish Holidays Calendar API.
  *
- * All business logic lives in src/lib/*.ts (pure functions, no Apify imports, unit
- * tested in isolation). This file only: reads input, works through the items in batches,
- * pushes + charges one row per item, and never lets one bad item kill the whole run.
+ * Unlike this repo's per-row Actors, one run computes ONE calendar (a year + location + category
+ * selection) and charges exactly one `calendar-year` event for it - the dataset can hold anywhere
+ * from a handful to a few hundred rows depending on `include`, but that is one unit of work, not
+ * one per row (see pricing.json / TOP60.md 4.3: "calendar-year, once per year and location mode").
  */
 import { Actor, log } from 'apify';
-import { processItem } from './lib/example.js';
+import { toCsv, toIcs } from './lib/format.js';
+import { generateCalendar } from './lib/holidays.js';
 import { InputError, normalizeInput } from './lib/input.js';
-import { describeCharging, PPE_EVENTS, pushResultsAndCharge, remainingChargeable } from './lib/ppe.js';
-
-const BATCH_SIZE = 50;
+import { PPE_EVENTS, chargeEvent, describeCharging, remainingChargeable } from './lib/ppe.js';
 
 await Actor.init();
 
@@ -18,63 +18,58 @@ try {
   const input = normalizeInput(await Actor.getInput());
   log.info(describeCharging());
 
-  const items = input.items.slice(0, input.maxItems);
-  if (input.items.length > items.length) {
-    log.warning(`Input had ${input.items.length} items; only processing the first ${items.length} (maxItems).`);
-  }
-
-  let processed = 0;
-  let failedRows = 0;
-  let unsavedRows = 0;
-  let stoppedForBudget = false;
-
-  while (processed < items.length) {
-    // Never compute rows nobody will be charged for: size the batch to the remaining budget.
-    const remaining = remainingChargeable(PPE_EVENTS.TASK_COMPLETED);
-    if (remaining <= 0) {
-      stoppedForBudget = true;
-      break;
-    }
-    const batch = items.slice(processed, processed + Math.min(BATCH_SIZE, remaining));
-
-    // One try/catch per item: an unexpected exception becomes one failed row, never a failed run.
-    const rows = batch.map((rawItem): Record<string, unknown> => {
-      try {
-        return { ...processItem(rawItem) };
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        log.error(`Unexpected error while processing one item: ${message}`);
-        return { input: String(rawItem), ok: false, value: null, error: `internal_error: ${message}` };
-      }
-    });
-
-    const outcome = await pushResultsAndCharge(rows, PPE_EVENTS.TASK_COMPLETED);
-    if (!outcome.ok) {
-      unsavedRows += rows.length;
-      processed += batch.length;
-      continue;
-    }
-    // In PPE runs the SDK saves only the rows that fit in maxTotalChargeUsd (pushedCount).
-    failedRows += rows.slice(0, outcome.pushedCount).filter((r) => r.ok === false).length;
-    processed += outcome.pushedCount;
-    if (outcome.pushedCount < rows.length) {
-      stoppedForBudget = true;
-      break;
-    }
-  }
-
-  if (stoppedForBudget) log.warning('maxTotalChargeUsd reached; stopped early instead of doing unpaid work.');
-  log.info(`Done: ${processed} of ${items.length} item(s) processed, ${failedRows} reported as failed.`);
-
-  if (unsavedRows > 0) {
-    // Infrastructure problem (dataset push failed): fail loudly instead of silently returning less data.
-    await Actor.fail(`${unsavedRows} result row(s) could not be saved to the dataset; see the log.`);
+  if (remainingChargeable(PPE_EVENTS.CALENDAR_YEAR) <= 0) {
+    // Never do work nobody will be charged for.
+    const message = 'Your maximum charge per run (maxTotalChargeUsd) is already reached; nothing was generated.';
+    log.warning(message);
+    await Actor.setValue('SUMMARY', { generated: false, reason: 'budget_exhausted' });
+    await Actor.exit({ statusMessage: message });
   } else {
-    await Actor.exit(stoppedForBudget ? { statusMessage: `Stopped at your maximum charge after ${processed} item(s).` } : undefined);
+    const rows = generateCalendar(input);
+    const holidayRows = rows.filter((r) => r.rowType === 'holiday');
+
+    let pushFailed = false;
+    try {
+      await Actor.pushData(rows as unknown as Record<string, unknown>[]);
+    } catch (err) {
+      pushFailed = true;
+      log.error(`Could not save the ${rows.length} generated row(s): ${err instanceof Error ? err.message : String(err)}`);
+    }
+
+    if (pushFailed) {
+      // Infrastructure problem: fail loudly instead of silently returning less data.
+      await Actor.fail(`The generated calendar could not be saved to the dataset; see the log.`);
+    } else {
+      let outputKey: string | null = null;
+      if (input.format === 'csv') {
+        await Actor.setValue('OUTPUT', toCsv(rows), { contentType: 'text/csv; charset=utf-8' });
+        outputKey = 'OUTPUT';
+      } else if (input.format === 'ics') {
+        const name = `Jewish holidays ${input.year} (${input.location})`;
+        await Actor.setValue('OUTPUT', toIcs(rows, name, new Date()), { contentType: 'text/calendar; charset=utf-8' });
+        outputKey = 'OUTPUT';
+      }
+
+      const charge = await chargeEvent(PPE_EVENTS.CALENDAR_YEAR, 1);
+      await Actor.setValue('SUMMARY', {
+        generated: true,
+        year: input.year,
+        yearType: input.yearType,
+        location: input.location,
+        include: input.include,
+        rowCount: holidayRows.length,
+        chargedEvents: charge.chargedCount,
+        outputKey,
+      });
+
+      const message =
+        `Generated ${holidayRows.length} row(s) for ${input.yearType === 'hebrew' ? 'Hebrew' : 'Gregorian'} year ${input.year} (${input.location})` +
+        (outputKey ? `; also wrote key-value store record "${outputKey}" (${input.format}).` : '.');
+      log.info(message);
+      await Actor.exit({ statusMessage: message });
+    }
   }
 } catch (err) {
   const message = err instanceof Error ? err.message : String(err);
-  // Bad input is the caller's mistake; anything else is ours. Either way fail loudly
-  // (exit code 1) instead of exiting 0 with an empty dataset.
   await Actor.fail(err instanceof InputError ? `Invalid input: ${message}` : `Actor run failed: ${message}`);
 }
