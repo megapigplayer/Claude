@@ -4,29 +4,57 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-      "input": {
-        "type": "string",
-        "description": "The original input item this result was computed from."
-      },
-      "ok": {
-        "type": "boolean",
-        "description": "Whether this item was processed successfully."
-      },
-      "error": {
-        "type": ["string", "null"],
-        "description": "Error message when ok is false, otherwise null."
-      }
+      "input": { "type": "string", "description": "The caller's entry exactly as provided (objects are JSON-stringified)." },
+      "position": { "type": "integer", "description": "1-based position among the non-blank entries." },
+      "status": { "type": "string", "enum": ["ok", "error"], "description": "Whether this entry was converted." },
+      "reasonCode": { "type": "string", "description": "Machine-readable outcome code, e.g. OK, INVALID_DATE, AMBIGUOUS_ADAR." },
+      "reason": { "type": ["string", "null"], "description": "Human-readable explanation, set when status is \"error\"." },
+      "direction": { "type": ["string", "null"], "enum": ["g2h", "h2g", null], "description": "Which way this entry was converted." },
+      "gregorian": { "type": ["string", "null"], "description": "The Gregorian calendar date shown (ISO YYYY-MM-DD)." },
+      "weekday": { "type": ["string", "null"], "description": "English weekday name of the Gregorian date." },
+      "weekdayHe": { "type": ["string", "null"], "description": "Hebrew weekday name." },
+      "afterSunset": { "type": ["boolean", "null"], "description": "Whether the Hebrew day shown began the evening before the Gregorian date." },
+      "hebrewDayGregorian": { "type": ["string", "null"], "description": "The Gregorian civil date that the Hebrew calendar day falls on (ISO), accounting for afterSunset." },
+      "beginsAtSunsetOn": { "type": ["string", "null"], "description": "The Gregorian evening (ISO date) when this Hebrew day begins." },
+      "hebrewDay": { "type": ["integer", "null"], "description": "Day of the Hebrew month (1-30)." },
+      "hebrewMonth": { "type": ["string", "null"], "description": "English Hebrew month name (e.g. \"Tishrei\", \"Adar II\")." },
+      "hebrewMonthHe": { "type": ["string", "null"], "description": "Hebrew month name in Hebrew letters." },
+      "hebrewMonthNumber": { "type": ["integer", "null"], "description": "Month number, Nisan = 1 ... Tishrei = 7 ... Adar = 12, Adar II = 13." },
+      "hebrewMonthOfYear": { "type": ["integer", "null"], "description": "Month position counted from Tishrei (Tishrei = 1)." },
+      "hebrewYear": { "type": ["integer", "null"], "description": "Hebrew year (anno mundi)." },
+      "hebrewString": { "type": ["string", "null"], "description": "Formatted English Hebrew date, e.g. \"17 Tishrei 5787\"." },
+      "hebrewStringHe": { "type": ["string", "null"], "description": "Formatted Hebrew date in gematria, e.g. \"י״ז בתשרי תשפ״ז\"." },
+      "isLeapYear": { "type": ["boolean", "null"], "description": "Whether the Hebrew year has 13 months (Adar I + Adar II)." },
+      "holidaySchedule": { "type": ["string", "null"], "enum": ["israel", "diaspora", null], "description": "Which schedule holiday/parasha tags used." },
+      "holiday": { "type": ["string", "null"], "description": "Jewish holiday(s) on this day, in English, if any." },
+      "holidayHe": { "type": ["string", "null"], "description": "Jewish holiday(s) on this day, in Hebrew, if any." },
+      "parasha": { "type": ["string", "null"], "description": "Weekly Torah portion, in English, when this day is Shabbat and has one." },
+      "parashaHe": { "type": ["string", "null"], "description": "Weekly Torah portion, in Hebrew." },
+      "anniversaryType": { "type": ["string", "null"], "enum": ["birthday", "yahrzeit", null], "description": "Set in anniversary mode." },
+      "anniversaries": { "type": ["array", "null"], "description": "In anniversary mode: the next occurrences (Hebrew and Gregorian dates) with the rule that applied." },
+      "ruleNote": { "type": ["string", "null"], "description": "In anniversary mode: an explanation when a leap-year / 30-Cheshvan / 30-Kislev rule affected the results." }
     },
-    "required": ["input", "ok"]
+    "required": ["input", "position", "status", "reasonCode"]
   },
   "views": {
     "overview": {
       "title": "Overview",
       "transformation": {
-        "fields": ["input", "ok", "error"]
+        "fields": ["input", "status", "direction", "gregorian", "hebrewString", "hebrewStringHe", "holiday", "parasha", "reason"]
       },
       "display": {
-        "component": "table"
+        "component": "table",
+        "properties": {
+          "input": { "label": "Input" },
+          "status": { "label": "Status" },
+          "direction": { "label": "Direction" },
+          "gregorian": { "label": "Gregorian" },
+          "hebrewString": { "label": "Hebrew date" },
+          "hebrewStringHe": { "label": "עברית" },
+          "holiday": { "label": "Holiday" },
+          "parasha": { "label": "Parasha" },
+          "reason": { "label": "Reason (if error)" }
+        }
       }
     }
   }

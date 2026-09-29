@@ -128,7 +128,7 @@ export function hebrewYearGematriya(year: number): string {
   if (!Number.isInteger(year) || year < 1 || year > 9999) throw new RangeError(`Hebrew year out of range: ${year}`);
   const thousands = Math.floor(year / 1000);
   const rest = year % 1000;
-  if (thousands === 5 && rest > 0) return gematriya(rest);
+  if (thousands === 0 || (thousands === 5 && rest > 0)) return gematriya(rest);
   const head = `${UNITS[thousands] ?? ''}${GERESH}`;
   return rest === 0 ? head : `${head}${gematriya(rest)}`;
 }

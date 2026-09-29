@@ -1,27 +1,40 @@
 {
   "requiredFields": [
     "input",
-    "ok",
-    "value",
-    "error"
+    "position",
+    "status",
+    "reasonCode",
+    "direction",
+    "gregorian",
+    "hebrewYear",
+    "hebrewString",
+    "hebrewStringHe",
+    "isLeapYear"
   ],
   "expectedItems": 2,
   "rows": [
     {
-      "input": "example-1",
-      "ok": true,
-      "value": "EXAMPLE-1",
-      "error": null
+      "input": "2026-09-12",
+      "status": "ok",
+      "direction": "g2h",
+      "gregorian": "2026-09-12",
+      "hebrewYear": 5787,
+      "hebrewString": "1 Tishrei 5787",
+      "isLeapYear": true,
+      "holiday": "Rosh Hashana 5787"
     },
     {
-      "input": "example-2",
-      "ok": true,
-      "value": "EXAMPLE-2",
-      "error": null
+      "input": "2026-09-28",
+      "status": "ok",
+      "direction": "g2h",
+      "gregorian": "2026-09-28",
+      "hebrewYear": 5787,
+      "hebrewString": "17 Tishrei 5787",
+      "isLeapYear": true
     }
   ],
   "charge": {
-    "eventName": "task-completed",
+    "eventName": "date-converted",
     "perItem": 1
   },
   "budgetCap": {
