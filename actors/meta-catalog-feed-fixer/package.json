@@ -1,0 +1,32 @@
+{
+  "name": "meta-catalog-feed-fixer",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Meta Catalog Feed Fixer: repairs Facebook/Instagram Commerce Manager catalog feeds (enums, prices, GTINs, duplicate IDs) and returns a fixed feed plus a per-row change log (Apify Actor).",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "node dist/main.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "apify": "^3.7.2",
+    "chardet": "2.2.0",
+    "csv-parse": "7.0.3",
+    "csv-stringify": "6.9.0",
+    "fast-xml-parser": "5.11.2",
+    "htmlparser2": "12.0.0",
+    "iconv-lite": "0.7.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

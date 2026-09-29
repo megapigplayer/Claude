@@ -1,0 +1,31 @@
+{
+  "requiredFields": [
+    "input",
+    "ok",
+    "value",
+    "error"
+  ],
+  "expectedItems": 2,
+  "rows": [
+    {
+      "input": "example-1",
+      "ok": true,
+      "value": "EXAMPLE-1",
+      "error": null
+    },
+    {
+      "input": "example-2",
+      "ok": true,
+      "value": "EXAMPLE-2",
+      "error": null
+    }
+  ],
+  "charge": {
+    "eventName": "task-completed",
+    "perItem": 1
+  },
+  "budgetCap": {
+    "maxTotalChargeUsd": 1,
+    "expectedItems": 1
+  }
+}

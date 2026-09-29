@@ -1,0 +1,16 @@
+{
+  "actorSpecification": 1,
+  "name": "localization-file-qa",
+  "title": "Localization File QA and Pseudo-Localizer",
+  "description": "One-line description of what this Actor does, shown in search results.",
+  "version": "0.0",
+  "buildTag": "latest",
+  "minMemoryMbytes": 256,
+  "defaultMemoryMbytes": 256,
+  "input": "./input_schema.json",
+  "dockerfile": "../Dockerfile",
+  "readme": "../README.md",
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  }
+}
