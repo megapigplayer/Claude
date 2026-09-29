@@ -1,0 +1,12 @@
+{
+  "_note": "Repo-local pricing plan. Apify does NOT read this file: prices are entered in Apify Console > Publication > Monetization (actor.json has no pricing field - verified against the official actor.json schema in @apify/json_schemas). It exists so scripts can cross-check that every event the code charges is declared here, and that priceUsd >= 5 x estimatedCostUsd (CONVENTIONS.md, pricing rule). Dependency licence: @hebcal/core is GPL-2.0, allowed here only because this Actor runs as a private hosted service (never distributed) - see LICENSES.md.",
+  "events": {
+    "calendar-year": {
+      "title": "Calendar year generated",
+      "description": "Charged once per run: one full calendar (year + location + category selection), regardless of how many holiday rows it produces.",
+      "priceUsd": 0.01,
+      "estimatedCostUsd": 2e-05,
+      "costBasis": "Measured locally on 2026-09-29 with `node scripts/smoke-local.mjs jewish-holidays-calendar --measure`: default input (include=[major,fasts], 32 rows) = 502ms wall / 104MB peak RSS = $1.39e-5 for the run's one charged event; all 8 categories + ics format (189 rows) = 565ms wall / 109MB peak RSS = $1.57e-5. This Actor charges exactly ONE event per run regardless of row count, so cost-per-event = total run cost (not run cost / row count). At 256MB billed memory and an ASSUMED $0.40 per compute unit (unverified; CONVENTIONS.md SMOKE_CU_USD) the worst observed case is rounded up to 2e-05. No paid external API, no network."
+    }
+  }
+}

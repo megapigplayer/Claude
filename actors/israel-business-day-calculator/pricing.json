@@ -1,0 +1,12 @@
+{
+  "_note": "Repo-local pricing plan. Apify does NOT read this file: prices are entered in Apify Console > Publication > Monetization (actor.json has no pricing field - verified against the official actor.json schema in @apify/json_schemas). It exists so scripts can cross-check that every event the code charges is declared here, and that priceUsd >= 5 x estimatedCostUsd (CONVENTIONS.md, pricing rule). Dependency licence: @hebcal/core is GPL-2.0, allowed here only because this Actor runs as a private hosted service (never distributed) - see LICENSES.md.",
+  "events": {
+    "calculation": {
+      "title": "Calculation computed",
+      "description": "Charged once per \"calculations\" entry successfully computed (one dataset row with status \"ok\"). A malformed entry (e.g. an invalid startDate, or a missing operation-specific field like endDate/paymentTerms) never got processed and is not charged.",
+      "priceUsd": 0.002,
+      "estimatedCostUsd": 7e-06,
+      "costBasis": "Measured locally on 2026-09-29 with `node scripts/smoke-local.mjs israel-business-day-calculator --measure`: 2-entry default input = 450ms wall / 98MB peak RSS = $6.25e-6/event; a 2,000-entry batch = 1.4s wall / 118MB peak RSS = $1.88e-8/event. At 256MB billed memory and an ASSUMED $0.40 per compute unit (unverified; CONVENTIONS.md SMOKE_CU_USD) the worst case is the smallest run (dominated by container start-up), rounded up to 7e-06. No paid external API, no network."
+    }
+  }
+}

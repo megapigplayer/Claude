@@ -1,0 +1,57 @@
+{
+  "title": "Shabbat Candle-Lighting and Zmanim Times input",
+  "type": "object",
+  "schemaVersion": 1,
+  "description": "Weekly Shabbat candle-lighting, havdalah, parasha and halachic times (zmanim) for any city or coordinates, computed offline (NOAA solar algorithm).",
+  "properties": {
+    "locations": {
+      "title": "Locations",
+      "type": "array",
+      "description": "One per line: a built-in city name (e.g. \"Jerusalem\", \"Tel Aviv\", \"New York\"; see the README for the full list of ~65) or JSON coordinates {\"latitude\":41.85,\"longitude\":-87.65,\"tzid\":\"America/Chicago\"}.",
+      "editor": "stringList",
+      "prefill": ["Jerusalem", "Tel Aviv", "New York"]
+    },
+    "startDate": {
+      "title": "Start date (a Friday)",
+      "type": "string",
+      "description": "ISO date (YYYY-MM-DD) of the first week's Friday. A date that is not a Friday rolls forward to the next one (never backward).",
+      "editor": "textfield",
+      "default": "2026-10-09"
+    },
+    "weeks": {
+      "title": "Number of weeks",
+      "type": "integer",
+      "description": "How many consecutive weeks (Fridays) to generate per location.",
+      "default": 1,
+      "minimum": 1,
+      "maximum": 52
+    },
+    "include": {
+      "title": "What to include",
+      "type": "array",
+      "description": "\"shabbat\" = friday/candleLighting/havdalah/parasha; \"zmanim\" = the detailed halachic-times block; \"holidays\" = any holiday(s) on/around that Shabbat.",
+      "editor": "stringList",
+      "default": ["shabbat"]
+    },
+    "candleLightingMinutes": {
+      "title": "Candle-lighting minutes before sunset (override)",
+      "type": "integer",
+      "description": "Leave unset to use the standard default: 18 minutes in the diaspora, 20 minutes elsewhere in Israel, 40 minutes in Jerusalem, 30 minutes in Haifa and Zikhron Ya'akov.",
+      "editor": "number"
+    },
+    "havdalahMinutes": {
+      "title": "Havdalah minutes after sunset (fixed, overrides havdalahDeg)",
+      "type": "integer",
+      "description": "Leave unset to use the degree-based time (havdalahDeg) instead. Common fixed values: 42, 50, 72.",
+      "editor": "number"
+    },
+    "havdalahDeg": {
+      "title": "Havdalah: degrees of solar depression",
+      "type": "number",
+      "description": "Used when havdalahMinutes is not set. Default 8.5 degrees (3 small/medium stars); 7.083 is a common alternative (3 medium stars, Rabbeinu Tam-adjacent opinions vary - see README).",
+      "default": 8.5,
+      "minimum": 0,
+      "maximum": 20
+    }
+  }
+}

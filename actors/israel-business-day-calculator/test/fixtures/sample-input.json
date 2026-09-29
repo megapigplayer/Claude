@@ -1,0 +1,7 @@
+{
+  "calculations": [
+    { "operation": "add", "startDate": "2026-09-10", "days": 3 },
+    { "operation": "payment-due", "startDate": "2026-01-15", "paymentTerms": "שוטף+60" }
+  ],
+  "calendarProfile": "il-workweek-sun-thu"
+}

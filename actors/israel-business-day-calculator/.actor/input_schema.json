@@ -1,0 +1,81 @@
+{
+  "title": "Israeli Business-Day and Payment-Terms Calculator input",
+  "type": "object",
+  "schemaVersion": 1,
+  "description": "Business-day maths on Israeli calendars (Sun-Thu, or Mon-Fri for TASE) plus שוטף+N payment-term due dates. Set the top-level fields for one calculation, or use \"calculations\" for many at once (each entry overrides the top-level fields it sets).",
+  "properties": {
+    "calculations": {
+      "title": "Calculations (bulk; optional)",
+      "type": "array",
+      "description": "One JSON object per calculation, e.g. {\"operation\":\"add\",\"startDate\":\"2026-09-10\",\"days\":5}. Leave this field itself unset (not just empty) to run a single calculation using the fields below instead. An empty object {} uses the fields below as-is.",
+      "editor": "json",
+      "prefill": [{}, { "operation": "next" }]
+    },
+    "operation": {
+      "title": "Operation",
+      "type": "string",
+      "description": "add/subtract N business days from startDate; count-between startDate and endDate; next business day after startDate; is-business-day check on startDate; payment-due applies paymentTerms to startDate.",
+      "enum": ["add", "subtract", "count-between", "next", "is-business-day", "payment-due"],
+      "enumTitles": ["Add business days", "Subtract business days", "Count business days between two dates", "Next business day", "Is this a business day?", "Payment due date (שוטף+N)"],
+      "default": "add"
+    },
+    "startDate": {
+      "title": "Start date",
+      "type": "string",
+      "description": "ISO date (YYYY-MM-DD). For payment-due this is the invoice date.",
+      "editor": "textfield",
+      "default": "2026-09-10"
+    },
+    "days": {
+      "title": "Days (for add/subtract)",
+      "type": "integer",
+      "description": "Number of business days to add or subtract. A negative value is applied in the opposite direction.",
+      "default": 3
+    },
+    "endDate": {
+      "title": "End date (for count-between)",
+      "type": "string",
+      "description": "ISO date (YYYY-MM-DD), required when operation is count-between.",
+      "editor": "textfield"
+    },
+    "paymentTerms": {
+      "title": "Payment terms (for payment-due)",
+      "type": "string",
+      "description": "\"שוטף+N\" or \"net-eom+N\" (end of the invoice month, plus N calendar days), e.g. \"שוטף+60\".",
+      "editor": "textfield"
+    },
+    "calendarProfile": {
+      "title": "Calendar profile",
+      "type": "string",
+      "description": "il-workweek-sun-thu: Sunday-Thursday, Friday+Saturday weekend. il-tase-mon-fri: TASE trading calendar (VERIFY: switches to Monday-Friday from 2026-01-05 per this Actor's unverified research brief - see README). iso-mon-fri: plain Monday-Friday, no Israeli holidays. custom: set customWeekendDays yourself.",
+      "enum": ["il-workweek-sun-thu", "il-tase-mon-fri", "iso-mon-fri", "custom"],
+      "enumTitles": ["Israel Sun-Thu workweek", "TASE trading calendar (VERIFY)", "Plain ISO Mon-Fri (no Israeli holidays)", "Custom weekend"],
+      "default": "il-workweek-sun-thu"
+    },
+    "rollConvention": {
+      "title": "Roll convention (for payment-due)",
+      "type": "string",
+      "description": "How to move a computed date that lands on a non-business day onto one: following (forward), modified-following (forward, unless that crosses into the next month, then backward), preceding (backward).",
+      "enum": ["following", "modified-following", "preceding"],
+      "default": "following"
+    },
+    "customWeekendDays": {
+      "title": "Custom weekend days (for calendarProfile=custom)",
+      "type": "array",
+      "description": "Weekday numbers that are weekend days: 0=Sunday .. 6=Saturday. Defaults to [5,6] (Friday+Saturday) if left empty.",
+      "editor": "json"
+    },
+    "extraHolidays": {
+      "title": "Extra holidays",
+      "type": "array",
+      "description": "ISO dates (YYYY-MM-DD) that are never business days, in addition to the profile's own holiday set (e.g. an ad-hoc election day).",
+      "editor": "stringList"
+    },
+    "halfDaysAreBusiness": {
+      "title": "Count half-days as business days",
+      "type": "boolean",
+      "description": "Erev-chag afternoons and, on the TASE profile, Friday's early close are \"half days\". True (default) counts them as business days (flagged halfDay); false treats them as non-business.",
+      "default": true
+    }
+  }
+}

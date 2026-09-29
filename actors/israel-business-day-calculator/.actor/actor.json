@@ -1,0 +1,16 @@
+{
+  "actorSpecification": 1,
+  "name": "israel-business-day-calculator",
+  "title": "Israeli Business Day Calculator (Sun-Thu, שוטף+N)",
+  "description": "Israeli business-day maths (Sun-Thu, or Mon-Fri for TASE) plus שוטף+N payment-terms due dates, with Erev-chag half-days and holiday-aware rolling.",
+  "version": "0.0",
+  "buildTag": "latest",
+  "minMemoryMbytes": 256,
+  "defaultMemoryMbytes": 256,
+  "input": "./input_schema.json",
+  "dockerfile": "../Dockerfile",
+  "readme": "../README.md",
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  }
+}

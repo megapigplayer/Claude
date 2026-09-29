@@ -1,0 +1,6 @@
+{
+  "locations": ["Jerusalem", "Tel Aviv", { "latitude": 41.8502, "longitude": -87.6501, "tzid": "America/Chicago", "name": "Chicago" }],
+  "startDate": "2026-10-09",
+  "weeks": 2,
+  "include": ["shabbat", "zmanim", "holidays"]
+}

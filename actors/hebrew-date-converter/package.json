@@ -1,0 +1,29 @@
+{
+  "name": "hebrew-date-converter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hebrew Date Converter API: bulk Gregorian <-> Hebrew date conversion with sunset rollover, gematria formatting, holiday/parasha tags and anniversary (birthday/yahrzeit) dates (Apify Actor).",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "node dist/main.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@hebcal/core": "6.10.0",
+    "apify": "^3.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "jewish-date": "2.0.29",
+    "kosher-zmanim": "0.9.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

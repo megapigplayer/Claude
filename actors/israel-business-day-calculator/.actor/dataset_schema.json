@@ -1,0 +1,75 @@
+{
+  "actorSpecification": 1,
+  "fields": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "input": { "type": "string", "description": "The calculation entry exactly as provided (an object is JSON-stringified)." },
+      "position": { "type": "integer", "description": "1-based position among the \"calculations\" entries." },
+      "operation": { "type": ["string", "null"], "description": "add, subtract, count-between, next, is-business-day or payment-due." },
+      "status": { "type": "string", "enum": ["ok", "error"], "description": "Whether this entry could be computed." },
+      "reasonCode": { "type": "string", "description": "Machine-readable outcome code, e.g. OK, INVALID_START_DATE, MISSING_END_DATE, UNPARSEABLE_PAYMENT_TERMS." },
+      "reason": { "type": ["string", "null"], "description": "Human-readable explanation, set when status is \"error\"." },
+      "result": { "type": ["string", "null"], "description": "ISO date (YYYY-MM-DD) of the computed result: the new date for add/subtract/next/payment-due, or the echoed endDate for count-between." },
+      "weekday": { "type": ["string", "null"], "description": "English weekday name of \"result\"." },
+      "weekdayHe": { "type": ["string", "null"], "description": "Hebrew weekday name." },
+      "resultHebrewDate": { "type": ["string", "null"], "description": "\"result\" as a Hebrew date, English formatting, e.g. \"17 Tishrei 5787\"." },
+      "resultHebrewDateHe": { "type": ["string", "null"], "description": "\"result\" as a Hebrew date in gematria." },
+      "isBusinessDay": { "type": ["boolean", "null"], "description": "Set for operation \"is-business-day\": whether startDate is a business day under the given profile." },
+      "rolled": { "type": ["boolean", "null"], "description": "True when the computed date did not already fall on a business day and had to be rolled (payment-due only; add/subtract/next always land on a business day by construction)." },
+      "rollReason": { "type": ["string", "null"], "description": "English name of the holiday/weekend that made rolling necessary." },
+      "rollReasonHe": { "type": ["string", "null"], "description": "Hebrew name of the same." },
+      "businessDaysCount": { "type": ["integer", "null"], "description": "Set for operation \"count-between\": positive when endDate is after startDate, negative when before, 0 when equal." },
+      "holidaysInRange": {
+        "type": ["array", "null"],
+        "description": "Holidays/extra-holidays encountered: skipped during add/subtract/next, in [startDate, endDate] for count-between, or on startDate itself for is-business-day/payment-due's final date.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "date": { "type": "string" },
+            "name": { "type": ["string", "null"] },
+            "nameHe": { "type": ["string", "null"] },
+            "reason": { "type": "string", "enum": ["holiday", "extra-holiday"] }
+          }
+        }
+      },
+      "halfDay": { "type": ["boolean", "null"], "description": "Whether the relevant date (startDate for is-business-day, the final date for payment-due) is a half business day (Erev-chag, or TASE's early Friday close)." },
+      "halfDayReason": { "type": ["string", "null"], "description": "English reason for the half day." },
+      "halfDayReasonHe": { "type": ["string", "null"], "description": "Hebrew reason for the half day." },
+      "assumptions": {
+        "type": "object",
+        "description": "Echoes the calendar profile and options actually used for this row.",
+        "properties": {
+          "calendarProfile": { "type": "string" },
+          "rollConvention": { "type": "string" },
+          "halfDaysAreBusiness": { "type": "boolean" },
+          "customWeekendDays": { "type": ["array", "null"] },
+          "extraHolidaysCount": { "type": "integer" }
+        }
+      }
+    },
+    "required": ["input", "position", "status", "reasonCode"]
+  },
+  "views": {
+    "overview": {
+      "title": "Overview",
+      "transformation": {
+        "fields": ["input", "operation", "status", "result", "weekday", "rolled", "businessDaysCount", "halfDay", "reason"]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "input": { "label": "Input" },
+          "operation": { "label": "Operation" },
+          "status": { "label": "Status" },
+          "result": { "label": "Result" },
+          "weekday": { "label": "Weekday" },
+          "rolled": { "label": "Rolled" },
+          "businessDaysCount": { "label": "Business days" },
+          "halfDay": { "label": "Half day" },
+          "reason": { "label": "Reason (if error)" }
+        }
+      }
+    }
+  }
+}

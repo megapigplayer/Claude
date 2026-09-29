@@ -1,0 +1,16 @@
+{
+  "actorSpecification": 1,
+  "name": "hebrew-date-converter",
+  "title": "Hebrew Date Converter API (Gregorian, sunset-aware)",
+  "description": "Bulk-convert Gregorian and Hebrew dates both ways with sunset rollover, Hebrew-letter (gematria) formatting, holiday/parasha tags and Hebrew birthday/yahrzeit anniversaries.",
+  "version": "0.0",
+  "buildTag": "latest",
+  "minMemoryMbytes": 256,
+  "defaultMemoryMbytes": 256,
+  "input": "./input_schema.json",
+  "dockerfile": "../Dockerfile",
+  "readme": "../README.md",
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  }
+}

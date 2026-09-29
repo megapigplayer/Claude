@@ -1,0 +1,56 @@
+{
+  "title": "Jewish Holidays Calendar API (Hebcal-style) input",
+  "type": "object",
+  "schemaVersion": 1,
+  "description": "Generate the full Jewish/Hebrew calendar for one year: holidays, fasts, Rosh Chodesh, Omer, parasha, Israel or diaspora schedule.",
+  "properties": {
+    "year": {
+      "title": "Year",
+      "type": "integer",
+      "description": "The Gregorian (or, if yearType is \"hebrew\", Hebrew) year to generate the calendar for.",
+      "editor": "number",
+      "prefill": 2026,
+      "minimum": 1,
+      "maximum": 9999
+    },
+    "yearType": {
+      "title": "Year type",
+      "type": "string",
+      "description": "Whether \"year\" is a Gregorian calendar year (spans two Hebrew years) or a single Hebrew year.",
+      "enum": ["gregorian", "hebrew"],
+      "enumTitles": ["Gregorian", "Hebrew"],
+      "default": "gregorian"
+    },
+    "location": {
+      "title": "Location",
+      "type": "string",
+      "description": "Israel observes one day for holidays the diaspora observes for two (e.g. Sukkot II is Chol HaMoed in Israel but a full Yom Tov in the diaspora), and has extra modern civil holidays (Yom HaAtzma'ut, Yom HaZikaron, ...).",
+      "enum": ["israel", "diaspora"],
+      "enumTitles": ["Israel", "Diaspora"],
+      "default": "israel"
+    },
+    "include": {
+      "title": "Categories to include",
+      "type": "array",
+      "description": "Which categories of day to return. Default is major holidays and fasts only; add \"minor\", \"roshChodesh\", \"modern\", \"omer\", \"parasha\" or \"specialShabbat\" for more (e.g. Chanukah and Purim are \"minor\").",
+      "editor": "stringList",
+      "prefill": ["major", "fasts"]
+    },
+    "language": {
+      "title": "Output language",
+      "type": "string",
+      "description": "Which language fields to fill in each result: English, Hebrew, or both.",
+      "enum": ["en", "he", "both"],
+      "enumTitles": ["English only", "Hebrew only", "Both"],
+      "default": "both"
+    },
+    "format": {
+      "title": "Output format",
+      "type": "string",
+      "description": "Dataset rows are always JSON. \"csv\" or \"ics\" additionally writes that file to the run's key-value store (record \"OUTPUT\") for direct download/import into a calendar app.",
+      "enum": ["json", "csv", "ics"],
+      "enumTitles": ["JSON only", "JSON + CSV file", "JSON + iCal (.ics) file"],
+      "default": "json"
+    }
+  }
+}

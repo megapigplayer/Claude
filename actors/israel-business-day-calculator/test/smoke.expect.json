@@ -1,0 +1,32 @@
+{
+  "requiredFields": [
+    "input",
+    "position",
+    "operation",
+    "status",
+    "reasonCode",
+    "result",
+    "weekday",
+    "assumptions"
+  ],
+  "expectedItems": 2,
+  "rows": [
+    {
+      "input": "{}",
+      "position": 1,
+      "operation": "add",
+      "status": "ok",
+      "result": "2026-09-16",
+      "weekday": "Wednesday",
+      "rolled": false
+    }
+  ],
+  "charge": {
+    "eventName": "calculation",
+    "perItem": 1
+  },
+  "budgetCap": {
+    "maxTotalChargeUsd": 1,
+    "expectedItems": 1
+  }
+}

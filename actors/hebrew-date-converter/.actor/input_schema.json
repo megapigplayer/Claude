@@ -1,0 +1,97 @@
+{
+  "title": "Hebrew Date Converter API (Gregorian, sunset-aware) input",
+  "type": "object",
+  "schemaVersion": 1,
+  "description": "Bulk-convert dates between Gregorian and the Hebrew calendar. Give one or more dates in `dates`; every non-blank entry produces one result row and one billed event.",
+  "properties": {
+    "dates": {
+      "title": "Dates to convert",
+      "type": "array",
+      "description": "One date per line: an ISO date (\"2026-09-12\"), an English Hebrew date (\"17 Tishrei 5787\"), Hebrew letters (\"י״ז בתשרי תשפ״ז\"), or JSON like {\"day\":17,\"month\":\"Tishrei\",\"year\":5787}. Ambiguous numeric formats (12/09/2026) are rejected; use ISO instead.",
+      "editor": "stringList",
+      "prefill": ["2026-09-12", "2026-09-28"]
+    },
+    "direction": {
+      "title": "Conversion direction",
+      "type": "string",
+      "description": "\"auto\" detects Gregorian vs Hebrew per entry; \"g2h\" requires every entry to be Gregorian, \"h2g\" requires every entry to be a Hebrew date.",
+      "enum": ["auto", "g2h", "h2g"],
+      "enumTitles": ["Auto-detect", "Gregorian to Hebrew", "Hebrew to Gregorian"],
+      "default": "auto"
+    },
+    "afterSunset": {
+      "title": "Treat Gregorian dates as after sunset",
+      "type": "boolean",
+      "description": "When true, a Gregorian entry with no explicit time is treated as occurring after sunset, so the Hebrew date rolls forward one day (the Hebrew day already began the evening before). Ignored for entries that set their own \"afterSunset\".",
+      "default": false
+    },
+    "language": {
+      "title": "Output language",
+      "type": "string",
+      "description": "Which language fields to fill in the result: English, Hebrew, or both.",
+      "enum": ["en", "he", "both"],
+      "enumTitles": ["English only", "Hebrew only", "Both"],
+      "default": "both"
+    },
+    "mode": {
+      "title": "Mode",
+      "type": "string",
+      "description": "\"convert\" returns the Hebrew/Gregorian equivalent of each date. \"anniversary\" also returns the next occurrences of a Hebrew birthday or yahrzeit.",
+      "enum": ["convert", "anniversary"],
+      "enumTitles": ["Convert only", "Convert + anniversary dates"],
+      "default": "convert"
+    },
+    "anniversaryType": {
+      "title": "Anniversary type (anniversary mode)",
+      "type": "string",
+      "description": "Which anniversary rule to apply when mode is \"anniversary\": a Hebrew birthday or a yahrzeit (both follow different rules in a leap year).",
+      "enum": ["birthday", "yahrzeit"],
+      "enumTitles": ["Birthday", "Yahrzeit"],
+      "default": "birthday"
+    },
+    "anniversaryYears": {
+      "title": "Number of anniversaries (anniversary mode)",
+      "type": "integer",
+      "description": "How many future anniversaries to list per date, starting the year after the original date.",
+      "default": 5,
+      "minimum": 1,
+      "maximum": 100
+    },
+    "anniversaryFrom": {
+      "title": "Only list anniversaries on/after this date (optional)",
+      "type": "string",
+      "description": "ISO date (YYYY-MM-DD). Anniversaries earlier than this Gregorian date are skipped; useful to resume a yearly reminder list. Leave blank to start from the first anniversary.",
+      "editor": "textfield"
+    },
+    "adarRule": {
+      "title": "Leap-year Adar rule (anniversary mode)",
+      "type": "string",
+      "description": "Which Adar a birthday/yahrzeit originally set in the single Adar of a regular year moves to in a leap year (which has Adar I and Adar II). \"default\" follows Reingold-Dershowitz: birthdays move to Adar II, yahrzeits to Adar I. Communities differ; ask your rabbi. VERIFY: not checked against halachic sources.",
+      "enum": ["default", "adar-i", "adar-ii"],
+      "enumTitles": ["Default (birthday->Adar II, yahrzeit->Adar I)", "Always Adar I", "Always Adar II"],
+      "default": "default"
+    },
+    "schedule": {
+      "title": "Holiday schedule",
+      "type": "string",
+      "description": "Israel observes one day for holidays that the diaspora observes for two (e.g. a second Rosh Hashana day is observed everywhere, but a second Sukkot/Pesach day only outside Israel). Affects the \"holiday\" and \"parasha\" tags.",
+      "enum": ["israel", "diaspora"],
+      "enumTitles": ["Israel", "Diaspora"],
+      "default": "israel"
+    },
+    "addTags": {
+      "title": "Add holiday and parasha tags",
+      "type": "boolean",
+      "description": "When true, each result also reports any Jewish holiday on that day and, for a Shabbat, the weekly Torah portion (parasha).",
+      "default": true
+    },
+    "maxItems": {
+      "title": "Max dates to process",
+      "type": "integer",
+      "description": "Safety cap so a mistaken huge input can't run away with the caller's budget or the daily health-check time limit.",
+      "default": 10000,
+      "minimum": 1,
+      "maximum": 100000
+    }
+  }
+}

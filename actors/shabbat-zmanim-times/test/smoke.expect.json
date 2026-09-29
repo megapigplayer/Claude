@@ -1,0 +1,40 @@
+{
+  "requiredFields": [
+    "input",
+    "position",
+    "week",
+    "status",
+    "reasonCode",
+    "friday",
+    "candleLighting",
+    "havdalah",
+    "parasha"
+  ],
+  "expectedItems": 3,
+  "rows": [
+    {
+      "input": "Jerusalem",
+      "position": 1,
+      "week": 1,
+      "status": "ok",
+      "friday": "2026-10-09",
+      "candleLighting": "2026-10-09T17:34:00+03:00",
+      "parasha": "Bereshit"
+    },
+    {
+      "input": "Tel Aviv",
+      "position": 2,
+      "week": 1,
+      "status": "ok",
+      "friday": "2026-10-09"
+    }
+  ],
+  "charge": {
+    "eventName": "location-week",
+    "perItem": 1
+  },
+  "budgetCap": {
+    "maxTotalChargeUsd": 1,
+    "expectedItems": 1
+  }
+}
