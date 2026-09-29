@@ -1,0 +1,58 @@
+{
+  "title": "Israeli ID, Company Number, IBAN & Phone Validator input",
+  "type": "object",
+  "schemaVersion": 1,
+  "description": "Paste values, one per line: ID numbers (ת.ז.), company numbers (ח.פ./ע.מ.), Israeli IBANs, phone numbers or 7-digit postcodes. Every non-blank value produces one result row and one billed event. Spaces, dashes, RTL marks and dropped leading zeros are fine.",
+  "properties": {
+    "values": {
+      "title": "Values to check",
+      "type": "array",
+      "description": "One value per line, e.g. \"123456782\", \"ת.ז. 034-567-891\", \"IL62 0108 0000 0009 9999 999\", \"050-234-5678\" or \"6100000\". With Type = auto the kind of value is detected from its shape (see the README).",
+      "editor": "stringList",
+      "prefill": [
+        "123456782",
+        "123456789",
+        "IL620108000000099999999",
+        "050-1234567",
+        "053-1234567",
+        "2222222"
+      ]
+    },
+    "type": {
+      "title": "Type of value",
+      "type": "string",
+      "description": "What the values are. Choose a specific type when your column is homogeneous: it gives the most precise reasons and removes the id / company ambiguity. auto detects the type per value.",
+      "enum": ["auto", "id", "company", "iban", "phone", "postcode"],
+      "enumTitles": [
+        "Auto-detect per value",
+        "ID number (ת.ז.)",
+        "Company / dealer number (ח.פ. / ע.מ.)",
+        "Israeli IBAN",
+        "Israeli phone number",
+        "Postcode (7 digits)"
+      ],
+      "default": "auto",
+      "editor": "select"
+    },
+    "rejectDummy": {
+      "title": "Reject placeholder numbers",
+      "type": "boolean",
+      "description": "Treat numbers such as 000000000, 111111118 or 2222222 (all the same digit, or a run of consecutive digits) as invalid (reason DUMMY) even when the checksum passes. Applies to IDs, company numbers and postcodes.",
+      "default": true
+    },
+    "normalize": {
+      "title": "Clean values before checking",
+      "type": "boolean",
+      "description": "On: remove spaces, dashes, RTL marks and labels such as \"ת.ז.\", convert Arabic-Indic digits, restore leading zeros dropped by spreadsheets (5-8 digit IDs) and accept 0 / +972 / 972 phone forms. Off: strict as-typed check (canonical form only).",
+      "default": true
+    },
+    "maxItems": {
+      "title": "Maximum values per run",
+      "type": "integer",
+      "description": "Safety cap: only the first N values are checked and billed.",
+      "default": 10000,
+      "minimum": 1,
+      "maximum": 100000
+    }
+  }
+}

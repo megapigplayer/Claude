@@ -1,0 +1,16 @@
+{
+  "actorSpecification": 1,
+  "name": "israeli-id-validator",
+  "title": "Israeli ID, Company Number, IBAN & Phone Validator",
+  "description": "Validate and normalize Israeli ID numbers (ת.ז.), company numbers (ח.פ./ע.מ.), IL IBANs, phone numbers and 7-digit postcodes in bulk. Offline checksum and format checks with clear reasons: no registry lookup, no login, nothing stored.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "minMemoryMbytes": 256,
+  "defaultMemoryMbytes": 256,
+  "input": "./input_schema.json",
+  "dockerfile": "../Dockerfile",
+  "readme": "../README.md",
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "israel-invoice-compliance-checker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Israel Tax Invoice & Allocation Number Checker: offline pre-check of allocation-number requirement (date + amount threshold), 18% VAT maths, document type and ID checksums (Apify Actor).",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "node dist/main.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "apify": "^3.7.2",
+    "decimal.js": "10.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

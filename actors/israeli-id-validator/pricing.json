@@ -1,0 +1,12 @@
+{
+  "_note": "Repo-local pricing plan. Apify does NOT read this file: prices are entered in Apify Console > Publication > Monetization (actor.json has no pricing field - verified against the official actor.json schema in @apify/json_schemas). It exists so scripts can cross-check that every event the code charges is declared here, and that priceUsd >= 5 x estimatedCostUsd (CONVENTIONS.md, pricing rule).",
+  "events": {
+    "value-checked": {
+      "title": "Value checked",
+      "description": "Charged once per non-blank value that was checked, whether the verdict is valid or invalid (one dataset row). Blank or unsupported entries and rows lost to an internal error are skipped and free.",
+      "priceUsd": 0.002,
+      "estimatedCostUsd": 0.00002,
+      "costBasis": "PLACEHOLDER - replaced with the measured numbers after `node scripts/smoke-local.mjs israeli-id-validator --measure`."
+    }
+  }
+}

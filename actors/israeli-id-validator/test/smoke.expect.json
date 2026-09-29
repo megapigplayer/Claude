@@ -1,0 +1,75 @@
+{
+  "requiredFields": [
+    "input",
+    "position",
+    "type",
+    "valid",
+    "reasonCode",
+    "reason",
+    "normalized",
+    "ambiguous",
+    "alsoValidAs",
+    "details",
+    "warnings",
+    "note"
+  ],
+  "expectedItems": 6,
+  "rows": [
+    {
+      "input": "123456782",
+      "position": 1,
+      "type": "id",
+      "valid": true,
+      "reasonCode": "OK",
+      "normalized": "123456782",
+      "ambiguous": true,
+      "alsoValidAs": ["company"]
+    },
+    {
+      "input": "123456789",
+      "type": "id",
+      "valid": false,
+      "reasonCode": "BAD_CHECKSUM",
+      "normalized": null,
+      "details": { "checkDigit": 9, "expectedCheckDigit": 2 }
+    },
+    {
+      "input": "IL620108000000099999999",
+      "type": "iban",
+      "valid": true,
+      "reasonCode": "OK",
+      "normalized": "IL620108000000099999999",
+      "details": { "bankCode": "010", "bankName": "Bank Leumi", "branchCode": "800", "accountNumber": "0000099999999" }
+    },
+    {
+      "input": "050-1234567",
+      "type": "phone",
+      "valid": false,
+      "reasonCode": "BAD_FORMAT",
+      "normalized": null
+    },
+    {
+      "input": "053-1234567",
+      "type": "phone",
+      "valid": true,
+      "reasonCode": "OK",
+      "normalized": "+972531234567",
+      "details": { "phoneType": "mobile", "region": "IL" }
+    },
+    {
+      "input": "2222222",
+      "type": "postcode",
+      "valid": false,
+      "reasonCode": "DUMMY",
+      "normalized": null
+    }
+  ],
+  "charge": {
+    "eventName": "value-checked",
+    "perItem": 1
+  },
+  "budgetCap": {
+    "maxTotalChargeUsd": 2,
+    "expectedItems": 2
+  }
+}

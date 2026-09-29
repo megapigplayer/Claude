@@ -1,0 +1,28 @@
+{
+  "name": "israeli-pii-redactor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Israeli PII Redactor: detect, redact or pseudonymize Israeli and common PII (ת.ז., phones, IBAN, cards, emails, IPs, Hebrew names, addresses) in text, CSV and JSON (Apify Actor).",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "node dist/main.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "apify": "^3.7.2",
+    "ibantools": "4.5.4",
+    "libphonenumber-js": "1.13.14"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

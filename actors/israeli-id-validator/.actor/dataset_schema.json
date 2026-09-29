@@ -1,0 +1,31 @@
+{
+  "actorSpecification": 1,
+  "fields": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "input": { "type": "string", "description": "The value exactly as provided (for joining results back to your data)." },
+      "position": { "type": "integer", "description": "1-based position among the non-blank entries of the input list." },
+      "type": { "type": ["string", "null"], "description": "Requested or detected type: id, company, iban, phone or postcode; null when auto-detection could not recognise the value." },
+      "valid": { "type": "boolean", "description": "true if the value passed every check for its type (checksum / numbering plan / format, and the placeholder check when rejectDummy is on)." },
+      "reasonCode": { "type": "string", "description": "OK, EMPTY, INVALID_CHARACTERS, WRONG_LENGTH, BAD_CHECKSUM, BAD_FORMAT, DUMMY, NOT_ISRAELI, UNKNOWN_FORMAT or INTERNAL_ERROR." },
+      "reason": { "type": "string", "description": "Human-readable explanation of the verdict." },
+      "normalized": { "type": ["string", "null"], "description": "Canonical form of a valid value: 9-digit ID / company number, electronic IBAN, E.164 phone number, 7-digit postcode; null otherwise." },
+      "ambiguous": { "type": "boolean", "description": "true when, in auto mode, the value is valid under more than one type (a 9-digit number can be both an ID and a company number). Not a failure." },
+      "alsoValidAs": { "type": "array", "items": { "type": "string" }, "description": "The other types the value is valid as when ambiguous is true." },
+      "details": { "type": ["object", "null"], "description": "Type-specific facts (check digit and expected check digit, bank code and name, phone type and formats ...). Only for values that passed the structural checks, plus the expected check digit on a checksum failure; null otherwise." },
+      "warnings": { "type": "array", "items": { "type": "string" }, "description": "Non-fatal observations: LEADING_ZEROS_RESTORED, INVISIBLE_CHARACTERS_REMOVED, NON_ASCII_DIGITS_CONVERTED, LABEL_REMOVED, LABEL_TYPE_MISMATCH, DUMMY_PATTERN, WELL_KNOWN_TEST_NUMBER, AMBIGUOUS_TYPE, EXTENSION_IGNORED, NOT_CORPORATE_PREFIX." },
+      "note": { "type": "string", "description": "What this check does NOT prove (checksum only, no registry lookup)." }
+    },
+    "required": ["input", "position", "valid", "reasonCode", "reason", "note"]
+  },
+  "views": {
+    "overview": {
+      "title": "Overview",
+      "transformation": {
+        "fields": ["input", "type", "valid", "reasonCode", "normalized", "ambiguous", "warnings"]
+      },
+      "display": { "component": "table" }
+    }
+  }
+}
