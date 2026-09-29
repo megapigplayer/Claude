@@ -13,6 +13,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@hebcal/core": "6.10.0",
     "apify": "^3.7.2"
   },
   "devDependencies": {

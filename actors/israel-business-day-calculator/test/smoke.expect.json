@@ -1,27 +1,28 @@
 {
   "requiredFields": [
     "input",
-    "ok",
-    "value",
-    "error"
+    "position",
+    "operation",
+    "status",
+    "reasonCode",
+    "result",
+    "weekday",
+    "assumptions"
   ],
   "expectedItems": 2,
   "rows": [
     {
-      "input": "example-1",
-      "ok": true,
-      "value": "EXAMPLE-1",
-      "error": null
-    },
-    {
-      "input": "example-2",
-      "ok": true,
-      "value": "EXAMPLE-2",
-      "error": null
+      "input": "{}",
+      "position": 1,
+      "operation": "add",
+      "status": "ok",
+      "result": "2026-09-16",
+      "weekday": "Wednesday",
+      "rolled": false
     }
   ],
   "charge": {
-    "eventName": "task-completed",
+    "eventName": "calculation",
     "perItem": 1
   },
   "budgetCap": {

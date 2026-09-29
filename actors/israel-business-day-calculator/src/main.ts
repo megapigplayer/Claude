@@ -1,80 +1,99 @@
 /**
- * Thin Apify wrapper for Israeli Business Day Calculator (Sun-Thu, שוטף+N).
+ * Thin Apify wrapper for the Israeli Business-Day and Payment-Terms Calculator.
  *
- * All business logic lives in src/lib/*.ts (pure functions, no Apify imports, unit
- * tested in isolation). This file only: reads input, works through the items in batches,
- * pushes + charges one row per item, and never lets one bad item kill the whole run.
+ * All business logic lives in src/lib/*.ts (pure functions, unit tested; only ppe.ts imports the
+ * Apify SDK). This file: reads input, computes each `calculations[]` entry against the top-level
+ * defaults, pushes one dataset row per entry (in input order, error rows included) and charges one
+ * `calculation` event per row that computed successfully. A malformed calculation entry (bad dates,
+ * missing operation-specific field) is visible in the dataset but free - it never got processed.
  */
 import { Actor, log } from 'apify';
-import { processItem } from './lib/example.js';
-import { InputError, normalizeInput } from './lib/input.js';
-import { describeCharging, PPE_EVENTS, pushResultsAndCharge, remainingChargeable } from './lib/ppe.js';
+import { type CalculationInput, buildRow } from './lib/calculate.js';
+import { InputError, mergeCalculation, normalizeInput } from './lib/input.js';
+import { PPE_EVENTS, chargeEvent, describeCharging, remainingChargeable } from './lib/ppe.js';
 
-const BATCH_SIZE = 50;
+const BATCH_SIZE = 200;
 
 await Actor.init();
 
 try {
   const input = normalizeInput(await Actor.getInput());
   log.info(describeCharging());
-
-  const items = input.items.slice(0, input.maxItems);
-  if (input.items.length > items.length) {
-    log.warning(`Input had ${input.items.length} items; only processing the first ${items.length} (maxItems).`);
-  }
+  const { calculations, ...topLevel } = input;
 
   let processed = 0;
-  let failedRows = 0;
-  let unsavedRows = 0;
+  let converted = 0;
+  let errors = 0;
+  let unsaved = 0;
+  let chargedEvents = 0;
   let stoppedForBudget = false;
 
-  while (processed < items.length) {
-    // Never compute rows nobody will be charged for: size the batch to the remaining budget.
-    const remaining = remainingChargeable(PPE_EVENTS.TASK_COMPLETED);
+  while (processed < calculations.length) {
+    const remaining = remainingChargeable(PPE_EVENTS.CALCULATION);
     if (remaining <= 0) {
       stoppedForBudget = true;
       break;
     }
-    const batch = items.slice(processed, processed + Math.min(BATCH_SIZE, remaining));
 
-    // One try/catch per item: an unexpected exception becomes one failed row, never a failed run.
-    const rows = batch.map((rawItem): Record<string, unknown> => {
+    const rows: Record<string, unknown>[] = [];
+    let billable = 0;
+    while (rows.length < BATCH_SIZE && processed + rows.length < calculations.length && billable < remaining) {
+      const entry = calculations[processed + rows.length];
+      const position = processed + rows.length + 1;
+      let row: Record<string, unknown>;
       try {
-        return { ...processItem(rawItem) };
+        const merged: CalculationInput = mergeCalculation(entry, topLevel);
+        row = { ...buildRow({ input: typeof entry === 'string' ? entry : JSON.stringify(entry), position }, merged) };
       } catch (err) {
+        // A malformed entry (mergeCalculation threw, e.g. entry is not an object): one free error row.
         const message = err instanceof Error ? err.message : String(err);
-        log.error(`Unexpected error while processing one item: ${message}`);
-        return { input: String(rawItem), ok: false, value: null, error: `internal_error: ${message}` };
+        row = {
+          input: typeof entry === 'string' ? entry : JSON.stringify(entry),
+          position,
+          operation: null,
+          status: 'error',
+          reasonCode: 'INVALID_CALCULATION',
+          reason: message,
+        };
       }
-    });
+      rows.push(row);
+      if (row.status === 'ok') billable += 1;
+    }
 
-    const outcome = await pushResultsAndCharge(rows, PPE_EVENTS.TASK_COMPLETED);
-    if (!outcome.ok) {
-      unsavedRows += rows.length;
-      processed += batch.length;
+    try {
+      await Actor.pushData(rows);
+    } catch (err) {
+      unsaved += rows.length;
+      processed += rows.length;
+      log.error(`Could not save ${rows.length} result row(s): ${err instanceof Error ? err.message : String(err)}`);
       continue;
     }
-    // In PPE runs the SDK saves only the rows that fit in maxTotalChargeUsd (pushedCount).
-    failedRows += rows.slice(0, outcome.pushedCount).filter((r) => r.ok === false).length;
-    processed += outcome.pushedCount;
-    if (outcome.pushedCount < rows.length) {
-      stoppedForBudget = true;
-      break;
+    if (billable > 0) {
+      const outcome = await chargeEvent(PPE_EVENTS.CALCULATION, billable);
+      chargedEvents += outcome.chargedCount;
     }
+    for (const row of rows) {
+      if (row.status === 'ok') converted++;
+      else errors++;
+    }
+    processed += rows.length;
   }
 
-  if (stoppedForBudget) log.warning('maxTotalChargeUsd reached; stopped early instead of doing unpaid work.');
-  log.info(`Done: ${processed} of ${items.length} item(s) processed, ${failedRows} reported as failed.`);
+  if (stoppedForBudget) log.warning('Your maximum charge per run (maxTotalChargeUsd) is reached; stopped early.');
+  const message =
+    `Computed ${converted} calculation${converted === 1 ? '' : 's'}` +
+    (errors > 0 ? `, ${errors} entr${errors === 1 ? 'y' : 'ies'} could not be computed (free, see reasonCode)` : '') +
+    (stoppedForBudget ? `; stopped at your maximum charge (${calculations.length - processed} entries not processed)` : '') +
+    '.';
+  log.info(message);
+  await Actor.setValue('SUMMARY', { total: processed, converted, errors, chargedEvents, stoppedForBudget });
 
-  if (unsavedRows > 0) {
-    // Infrastructure problem (dataset push failed): fail loudly instead of silently returning less data.
-    await Actor.fail(`${unsavedRows} result row(s) could not be saved to the dataset; see the log.`);
+  if (unsaved > 0) {
+    await Actor.fail(`${unsaved} result row(s) could not be saved to the dataset; see the log.`);
   } else {
-    await Actor.exit(stoppedForBudget ? { statusMessage: `Stopped at your maximum charge after ${processed} item(s).` } : undefined);
+    await Actor.exit({ statusMessage: message });
   }
 } catch (err) {
   const message = err instanceof Error ? err.message : String(err);
-  // Bad input is the caller's mistake; anything else is ours. Either way fail loudly
-  // (exit code 1) instead of exiting 0 with an empty dataset.
   await Actor.fail(err instanceof InputError ? `Invalid input: ${message}` : `Actor run failed: ${message}`);
 }
