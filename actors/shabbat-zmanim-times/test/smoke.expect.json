@@ -1,27 +1,36 @@
 {
   "requiredFields": [
     "input",
-    "ok",
-    "value",
-    "error"
+    "position",
+    "week",
+    "status",
+    "reasonCode",
+    "friday",
+    "candleLighting",
+    "havdalah",
+    "parasha"
   ],
-  "expectedItems": 2,
+  "expectedItems": 3,
   "rows": [
     {
-      "input": "example-1",
-      "ok": true,
-      "value": "EXAMPLE-1",
-      "error": null
+      "input": "Jerusalem",
+      "position": 1,
+      "week": 1,
+      "status": "ok",
+      "friday": "2026-10-09",
+      "candleLighting": "2026-10-09T17:34:00+03:00",
+      "parasha": "Bereshit"
     },
     {
-      "input": "example-2",
-      "ok": true,
-      "value": "EXAMPLE-2",
-      "error": null
+      "input": "Tel Aviv",
+      "position": 2,
+      "week": 1,
+      "status": "ok",
+      "friday": "2026-10-09"
     }
   ],
   "charge": {
-    "eventName": "task-completed",
+    "eventName": "location-week",
     "perItem": 1
   },
   "budgetCap": {

@@ -2,7 +2,7 @@
   "actorSpecification": 1,
   "name": "shabbat-zmanim-times",
   "title": "Shabbat Times & Zmanim API (candle lighting)",
-  "description": "One-line description of what this Actor does, shown in search results.",
+  "description": "Weekly Shabbat candle-lighting, havdalah, parasha and halachic times (zmanim) for any city or coordinates, computed offline for one or many weeks at once.",
   "version": "0.0",
   "buildTag": "latest",
   "minMemoryMbytes": 256,

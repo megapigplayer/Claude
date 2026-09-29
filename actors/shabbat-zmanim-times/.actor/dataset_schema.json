@@ -4,29 +4,71 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-      "input": {
-        "type": "string",
-        "description": "The original input item this result was computed from."
+      "input": { "type": "string", "description": "The location entry exactly as provided (a coordinate object is JSON-stringified)." },
+      "position": { "type": "integer", "description": "1-based position among the non-blank \"locations\" entries." },
+      "week": { "type": "integer", "description": "1-based week number within this location (1..weeks)." },
+      "status": { "type": "string", "enum": ["ok", "error"], "description": "Whether this location could be resolved and computed." },
+      "reasonCode": { "type": "string", "description": "Machine-readable outcome code, e.g. OK, UNKNOWN_CITY, BAD_LATITUDE, BAD_TZID." },
+      "reason": { "type": ["string", "null"], "description": "Human-readable explanation, set when status is \"error\"." },
+      "location": {
+        "type": ["object", "null"],
+        "description": "The resolved location.",
+        "properties": {
+          "name": { "type": "string" },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" },
+          "tzid": { "type": "string" },
+          "elevation": { "type": "number" },
+          "israel": { "type": "boolean" }
+        }
       },
-      "ok": {
-        "type": "boolean",
-        "description": "Whether this item was processed successfully."
+      "friday": { "type": ["string", "null"], "description": "ISO date (YYYY-MM-DD) of this week's Friday." },
+      "fridayRolledForward": { "type": ["boolean", "null"], "description": "True on week 1 only, when the requested startDate was not itself a Friday and was rolled forward to the next one." },
+      "candleLighting": { "type": ["string", "null"], "description": "ISO 8601 timestamp WITH the location's real UTC offset (not UTC - see README). Null if include excludes \"shabbat\" or there is no sunset that day (see warnings)." },
+      "havdalah": { "type": ["string", "null"], "description": "ISO 8601 timestamp with offset; may fall a day or two after Friday when Shabbat is chained to an adjacent multi-day festival." },
+      "parasha": { "type": ["string", "null"], "description": "Weekly Torah portion (English), when this Shabbat has one (not a festival reading)." },
+      "parashaHe": { "type": ["string", "null"], "description": "Weekly Torah portion (Hebrew)." },
+      "holiday": { "type": ["string", "null"], "description": "Any holiday(s)/Rosh Chodesh falling Friday through the following Monday, semicolon-separated. Only computed when include contains \"holidays\"." },
+      "holidayHe": { "type": ["string", "null"], "description": "Same, in Hebrew." },
+      "zmanim": {
+        "type": ["object", "null"],
+        "description": "Friday's halachic times. Only computed when include contains \"zmanim\". Each field is an ISO 8601 timestamp with offset, or null (see the README for when degree-based times can be null even with a normal sunset).",
+        "properties": {
+          "alotHaShachar": { "type": ["string", "null"] },
+          "neitzHaChama": { "type": ["string", "null"] },
+          "sofZmanShmaGra": { "type": ["string", "null"] },
+          "sofZmanShmaMga": { "type": ["string", "null"] },
+          "chatzot": { "type": ["string", "null"] },
+          "minchaGedola": { "type": ["string", "null"] },
+          "minchaKetana": { "type": ["string", "null"] },
+          "plagHaMincha": { "type": ["string", "null"] },
+          "shkia": { "type": ["string", "null"] },
+          "tzeit": { "type": ["string", "null"] }
+        }
       },
-      "error": {
-        "type": ["string", "null"],
-        "description": "Error message when ok is false, otherwise null."
-      }
+      "warnings": { "type": ["array", "null"], "description": "Notable conditions, e.g. no sunrise/sunset that day (polar day/night)." }
     },
-    "required": ["input", "ok"]
+    "required": ["input", "position", "week", "status", "reasonCode"]
   },
   "views": {
     "overview": {
       "title": "Overview",
       "transformation": {
-        "fields": ["input", "ok", "error"]
+        "fields": ["input", "week", "status", "friday", "candleLighting", "havdalah", "parasha", "holiday", "reason"]
       },
       "display": {
-        "component": "table"
+        "component": "table",
+        "properties": {
+          "input": { "label": "Location" },
+          "week": { "label": "Week" },
+          "status": { "label": "Status" },
+          "friday": { "label": "Friday" },
+          "candleLighting": { "label": "Candle lighting" },
+          "havdalah": { "label": "Havdalah" },
+          "parasha": { "label": "Parasha" },
+          "holiday": { "label": "Holiday" },
+          "reason": { "label": "Reason (if error)" }
+        }
       }
     }
   }

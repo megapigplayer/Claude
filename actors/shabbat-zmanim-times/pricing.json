@@ -1,12 +1,12 @@
 {
-  "_note": "Repo-local pricing plan. Apify does NOT read this file: prices are entered in Apify Console > Publication > Monetization (actor.json has no pricing field - verified against the official actor.json schema in @apify/json_schemas). It exists so scripts can cross-check that every event the code charges is declared here, and that priceUsd >= 5 x estimatedCostUsd (CONVENTIONS.md, pricing rule).",
+  "_note": "Repo-local pricing plan. Apify does NOT read this file: prices are entered in Apify Console > Publication > Monetization (actor.json has no pricing field - verified against the official actor.json schema in @apify/json_schemas). It exists so scripts can cross-check that every event the code charges is declared here, and that priceUsd >= 5 x estimatedCostUsd (CONVENTIONS.md, pricing rule). Dependency licence: @hebcal/core is GPL-2.0, allowed here only because this Actor runs as a private hosted service (never distributed) - see LICENSES.md. @hebcal/core itself depends on @hebcal/noaa (LGPL-2.1, NOAA solar algorithm) for the Zmanim class this Actor uses; no separate dependency was added.",
   "events": {
-    "task-completed": {
-      "title": "Task completed",
-      "description": "Charged once per processed input item (one dataset row).",
-      "priceUsd": 0.002,
-      "estimatedCostUsd": 0.0001,
-      "costBasis": "Fill in: measured wall time x memory x compute-unit price, plus any paid third-party API cost, per event. See CONVENTIONS.md."
+    "location-week": {
+      "title": "Location-week computed",
+      "description": "Charged once per (location, week) that was successfully computed. A location that could not be resolved (e.g. an unknown city name or bad coordinates) delivered no result and is not charged, for every week that would have covered - consistent across this Actor's whole run: see src/lib/batch.ts.",
+      "priceUsd": 0.01,
+      "estimatedCostUsd": 5e-06,
+      "costBasis": "Measured locally on 2026-09-29 with `node scripts/smoke-local.mjs shabbat-zmanim-times --measure`: default input (3 locations x 1 week = 3 events) = 474ms wall / 108MB peak RSS = $4.39e-6/event; a 20-location x 52-week batch (1040 events, all categories) = 1.4s wall / 134MB peak RSS = $3.68e-8/event. At 256MB billed memory and an ASSUMED $0.40 per compute unit (unverified; CONVENTIONS.md SMOKE_CU_USD) the worst case is the smallest run (dominated by container start-up), rounded up to 5e-06. No paid external API, no network."
     }
   }
 }

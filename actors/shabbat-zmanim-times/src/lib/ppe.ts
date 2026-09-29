@@ -42,7 +42,7 @@ import { Actor, log } from 'apify';
  * and with the event configured in Apify Console > Publication > Monetization.
  */
 export const PPE_EVENTS = {
-  TASK_COMPLETED: 'task-completed',
+  LOCATION_WEEK: 'location-week',
 } as const;
 
 export interface ChargeOutcome {
