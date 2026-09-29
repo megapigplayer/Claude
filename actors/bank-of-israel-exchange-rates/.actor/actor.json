@@ -1,0 +1,16 @@
+{
+  "actorSpecification": 1,
+  "name": "bank-of-israel-exchange-rates",
+  "title": "Bank of Israel Exchange Rates (שער יציג) & ILS Converter",
+  "description": "Official Bank of Israel representative exchange rates (שער יציג) for 14 currencies: daily and historical ILS rates, bulk date ranges, and invoice-date conversion with the last-published-on-or-before rule.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "minMemoryMbytes": 256,
+  "defaultMemoryMbytes": 256,
+  "input": "./input_schema.json",
+  "dockerfile": "../Dockerfile",
+  "readme": "../README.md",
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  }
+}

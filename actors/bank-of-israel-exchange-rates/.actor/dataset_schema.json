@@ -1,0 +1,39 @@
+{
+  "actorSpecification": 1,
+  "fields": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "rowType": { "type": "string", "description": "\"rate\" (a published rate for a date and currency) or \"conversion\" (an amount converted to ILS)." },
+      "ok": { "type": "boolean", "description": "true when a rate was found (and, for conversions, the amount converted); false for a free notice row." },
+      "reasonCode": { "type": "string", "description": "OK, UNKNOWN_CURRENCY, INVALID_AMOUNT, INVALID_DATE, DATE_IN_FUTURE, INVALID_CONVERSION, NO_RATE_PUBLISHED, SOURCE_UNAVAILABLE, SOURCE_FORMAT_ERROR or INTERNAL_ERROR." },
+      "reason": { "type": "string", "description": "Human-readable explanation, including which day's rate was used when it differs from the requested date." },
+      "position": { "type": "integer", "description": "Conversion rows: 1-based position in the input \"conversions\" list." },
+      "reference": { "type": ["string", "null"], "description": "Conversion rows: the caller's own reference (for example an invoice number), echoed back." },
+      "date": { "type": ["string", "null"], "description": "The calendar date asked for (YYYY-MM-DD). Echoed as written when a conversion date could not be parsed; null for an unknown-currency notice in a range." },
+      "currency": { "type": "string", "description": "ISO 4217 currency code (or the text that could not be recognised)." },
+      "rate": { "type": ["number", "null"], "description": "Rate rows: the published representative rate, ILS per `unit` units of the currency." },
+      "rateUsed": { "type": ["number", "null"], "description": "Conversion rows: the published rate applied, ILS per `unit` units of the currency." },
+      "unit": { "type": ["integer", "null"], "description": "Units of the foreign currency covered by the rate (1 for most, 100 for JPY)." },
+      "change": { "type": ["number", "null"], "description": "Rate rows: percent change against the previous published rate; null when unknown." },
+      "amount": { "type": ["number", "null"], "description": "Conversion rows: the amount in the foreign currency." },
+      "ilsAmount": { "type": ["number", "null"], "description": "Conversion rows: amount x rate / unit in ILS, rounded half-up to 2 decimals." },
+      "rateDate": { "type": ["string", "null"], "description": "The publication date of the rate that was used (equals `date` on publication days)." },
+      "daysBack": { "type": ["integer", "null"], "description": "Days between `date` and `rateDate` (0 when the rate was published on the requested date)." },
+      "ruleApplied": { "type": "string", "description": "The rateRule that was used." },
+      "publishedAt": { "type": ["string", "null"], "description": "ISO timestamp of publication when the source states it, otherwise null." },
+      "provisional": { "type": ["boolean", "null"], "description": "true while the rate may still be revised (about 15 minutes after publication)." },
+      "dataSource": { "type": "string", "description": "\"live\" (Bank of Israel) or \"fixtures\" (synthetic test data; only possible outside the Apify platform)." }
+    },
+    "required": ["rowType", "ok", "reasonCode", "reason", "currency", "ruleApplied", "dataSource"]
+  },
+  "views": {
+    "overview": {
+      "title": "Overview",
+      "transformation": {
+        "fields": ["rowType", "date", "currency", "rate", "unit", "rateDate", "amount", "rateUsed", "ilsAmount", "reference", "reasonCode", "provisional"]
+      },
+      "display": { "component": "table" }
+    }
+  }
+}

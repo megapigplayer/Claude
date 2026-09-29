@@ -1,0 +1,42 @@
+{
+  "requiredFields": [
+    "rowType",
+    "ok",
+    "reasonCode",
+    "reason",
+    "date",
+    "currency",
+    "rate",
+    "unit",
+    "change",
+    "publishedAt",
+    "provisional",
+    "rateDate",
+    "daysBack",
+    "ruleApplied",
+    "dataSource"
+  ],
+  "expectedItems": 1,
+  "rows": [
+    {
+      "rowType": "rate",
+      "ok": true,
+      "reasonCode": "OK",
+      "date": "2026-09-23",
+      "currency": "USD",
+      "rate": 3.2316,
+      "unit": 1,
+      "change": 0.31,
+      "publishedAt": null,
+      "provisional": false,
+      "rateDate": "2026-09-23",
+      "daysBack": 0,
+      "ruleApplied": "last-published-on-or-before",
+      "dataSource": "fixtures"
+    }
+  ],
+  "charge": {
+    "eventName": "rate-row",
+    "perItem": 1
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "bank-of-israel-exchange-rates",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Bank of Israel Exchange Rates (שער יציג) & ILS Converter: official daily representative rates, bulk date ranges and invoice-date conversion with the \"last rate published on or before\" rule (Apify Actor).",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "node dist/main.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "apify": "^3.7.2",
+    "decimal.js": "10.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

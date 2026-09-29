@@ -1,0 +1,54 @@
+{
+  "title": "Bank of Israel Exchange Rates input",
+  "type": "object",
+  "schemaVersion": 1,
+  "description": "Official Bank of Israel representative exchange rates (שער יציג) against the shekel. Get a date range for one or more currencies, and/or convert a list of amounts to ILS at the rate that applies on each invoice date. Every row with a rate is one billed event; notice rows (unknown currency, no rate) are free.",
+  "properties": {
+    "currencies": {
+      "title": "Currencies",
+      "type": "array",
+      "description": "Currencies for the date range below, as ISO codes (also accepted: $, €, £, ¥ and English or Hebrew names such as דולר or euro). Supported: USD, GBP, JPY, EUR, AUD, CAD, DKK, NOK, ZAR, SEK, CHF, JOD, LBP, EGP. Leave the list empty if you only need conversions.",
+      "editor": "stringList",
+      "prefill": ["USD"]
+    },
+    "dateFrom": {
+      "title": "From date",
+      "type": "string",
+      "description": "First date of the range as YYYY-MM-DD, or the word today (Israel time). If empty, the range is the single date in \"To date\". Formats such as 07/01/2025 are rejected on purpose because day-first and month-first are ambiguous.",
+      "editor": "textfield",
+      "prefill": "2026-09-23",
+      "pattern": "^\\s*(\\d{4}-\\d{2}-\\d{2}([T ][0-9:.+\\-Z]*)?|[Tt][Oo][Dd][Aa][Yy])\\s*$"
+    },
+    "dateTo": {
+      "title": "To date",
+      "type": "string",
+      "description": "Last date of the range (inclusive) as YYYY-MM-DD, or today. If empty and currencies are given, today (Israel time) is used. A date in the future is cut back to today.",
+      "editor": "textfield",
+      "prefill": "2026-09-23",
+      "pattern": "^\\s*(\\d{4}-\\d{2}-\\d{2}([T ][0-9:.+\\-Z]*)?|[Tt][Oo][Dd][Aa][Yy])\\s*$"
+    },
+    "conversions": {
+      "title": "Conversions to ILS (optional)",
+      "type": "array",
+      "description": "Amounts to convert to shekels, each as {\"amount\": 1200, \"currency\": \"USD\", \"date\": \"2025-01-07\", \"reference\": \"INV-1042\"}. The rate is chosen by the rule below; \"reference\" is optional and echoed back so you can match rows to your invoices.",
+      "editor": "json"
+    },
+    "rateRule": {
+      "title": "Which rate applies when a date has none of its own",
+      "type": "string",
+      "description": "The Bank of Israel publishes on banking days only. last-published-on-or-before (default): the newest rate published on that date or before it (the usual rule for invoices). previous-business-day: the newest rate published strictly before the date. same-day: only a rate published on exactly that date (otherwise no rate: a notice row for conversions, no row for range dates).",
+      "editor": "select",
+      "enum": ["last-published-on-or-before", "previous-business-day", "same-day"],
+      "enumTitles": ["Last published on or before the date (default)", "Previous business day (strictly before)", "Same day only"],
+      "default": "last-published-on-or-before"
+    },
+    "maxItems": {
+      "title": "Maximum rows per run",
+      "type": "integer",
+      "description": "Safety cap on the number of result rows (range rows plus conversions). Rows beyond the cap are not produced or billed.",
+      "default": 5000,
+      "minimum": 1,
+      "maximum": 100000
+    }
+  }
+}
