@@ -1,0 +1,33 @@
+{
+  "actorSpecification": 1,
+  "fields": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "input": {
+        "type": "string",
+        "description": "The original input item this result was computed from."
+      },
+      "ok": {
+        "type": "boolean",
+        "description": "Whether this item was processed successfully."
+      },
+      "error": {
+        "type": ["string", "null"],
+        "description": "Error message when ok is false, otherwise null."
+      }
+    },
+    "required": ["input", "ok"]
+  },
+  "views": {
+    "overview": {
+      "title": "Overview",
+      "transformation": {
+        "fields": ["input", "ok", "error"]
+      },
+      "display": {
+        "component": "table"
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "title": "Israeli Business Day Calculator (Sun-Thu, שוטף+N) input",
+  "type": "object",
+  "schemaVersion": 1,
+  "description": "One or two user-facing sentences shown above the input form. (Template note: see CONVENTIONS.md > Input schema conventions before editing the prefill.)",
+  "properties": {
+    "items": {
+      "title": "Items to process",
+      "type": "array",
+      "description": "List of input strings. Replace this with the field(s) your Actor actually needs.",
+      "editor": "stringList",
+      "prefill": [
+        "example-1",
+        "example-2"
+      ]
+    },
+    "maxItems": {
+      "title": "Max items to process",
+      "type": "integer",
+      "description": "Safety cap so a mistaken huge input can't run away with the caller's budget or the daily health-check time limit.",
+      "default": 1000,
+      "minimum": 1
+    }
+  }
+}

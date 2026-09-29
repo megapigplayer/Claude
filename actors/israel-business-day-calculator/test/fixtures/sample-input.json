@@ -1,0 +1,4 @@
+{
+  "items": ["example-1", "example-2"],
+  "maxItems": 1000
+}

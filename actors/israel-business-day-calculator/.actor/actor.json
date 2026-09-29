@@ -1,0 +1,16 @@
+{
+  "actorSpecification": 1,
+  "name": "israel-business-day-calculator",
+  "title": "Israeli Business Day Calculator (Sun-Thu, שוטף+N)",
+  "description": "One-line description of what this Actor does, shown in search results.",
+  "version": "0.0",
+  "buildTag": "latest",
+  "minMemoryMbytes": 256,
+  "defaultMemoryMbytes": 256,
+  "input": "./input_schema.json",
+  "dockerfile": "../Dockerfile",
+  "readme": "../README.md",
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  }
+}

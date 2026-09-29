@@ -1,0 +1,12 @@
+{
+  "_note": "Repo-local pricing plan. Apify does NOT read this file: prices are entered in Apify Console > Publication > Monetization (actor.json has no pricing field - verified against the official actor.json schema in @apify/json_schemas). It exists so scripts can cross-check that every event the code charges is declared here, and that priceUsd >= 5 x estimatedCostUsd (CONVENTIONS.md, pricing rule).",
+  "events": {
+    "task-completed": {
+      "title": "Task completed",
+      "description": "Charged once per processed input item (one dataset row).",
+      "priceUsd": 0.002,
+      "estimatedCostUsd": 0.0001,
+      "costBasis": "Fill in: measured wall time x memory x compute-unit price, plus any paid third-party API cost, per event. See CONVENTIONS.md."
+    }
+  }
+}

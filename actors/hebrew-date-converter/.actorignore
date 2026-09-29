@@ -1,0 +1,8 @@
+# Files excluded from `apify push` (in addition to .gitignore). The Apify build compiles src/
+# itself (see Dockerfile), so build output, tests and local-only files must not be uploaded.
+node_modules
+dist
+storage
+test
+pricing.json
+*.log
